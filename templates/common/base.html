@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex">
+    <title>上海财务</title>
+
+    <script type='text/javascript' src="{% static 'js/common/jquery.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'js/common/bootstrap.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/common/bootstrap.css' %}">
+
+
+    <script type="text/javascript" src="{% static 'js/common/echarts.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/common/colors.min.css' %}">
+
+    <script type='text/javascript' src="{% static 'js/common/bootstrap-table.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/common/bootstrap-table.css' %}">
+
+
+    <link rel="stylesheet" href="{% static 'css/common/bootstrap-datepicker.standalone.min.css' %}">
+    <script src="{% static 'js/common/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/common/bootstrap-datepicker.zh-CN.min.js' %}"></script>
+    <script type="text/javascript" charset="utf-8" async="" src="https://cdn.jsdelivr.net/npm/live2d-widget@3.0.5/lib/L2Dwidget.min.js"></script>
+
+
+    <script src="{% static 'js/common/bootstrap-table-editable.js' %}"></script>
+    <script src="{% static 'js/common/bootstrap-editable.js' %}"></script>
+    <script src="{% static 'js/common/common.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/common/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/common/bootstrap-editable.css' %}>
+
+
+</head>
+<body style="background: cornsilk">
+<div id="header" class="container navbar-fixed-top" style="font-size:20px;padding: 10px;">
+    <a href="/index">首页</a>
+    <a href="/details">账单明细</a>
+    <a href="/category_statistics">月度收支</a>
+    <a href="/annual">年度收支</a>
+    <a href="/statistics">统计</a>
+    <a href="/search">详情</a>
+    <a href="/update">数据录入</a>
+    <button onclick="javascript:window.print()" style="margin-left: 60px" class="btn button">打印</button>
+</div>
+<div style="padding-top: 50px">
+
+</div>
+{% block content %} {% endblock %}
+<script src="{% static 'js/common/cat_widget.js' %}"></script>
+</body>
+</html>
