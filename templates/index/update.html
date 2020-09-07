@@ -1,0 +1,106 @@
+{% extends "common/base.html"%}
+
+
+{% block content %}
+<div class="container" style="padding: 10px; ">
+
+    <form action="{% url 'index:update' %}" method="post">
+        <div class="input-group" style="width: 200px;padding: 10px;display: inline-flex;">
+            <input type="text" placeholder="账单月" class="form-control picker"
+                   name='{{name}}'>
+            <input type="submit" value="确认">
+        </div>
+    </form>
+
+    <script type="text/javascript">
+        $(".picker").datepicker({
+            format: "yyyy-mm",
+            todayBtn: "linked",
+            language: "zh-CN",
+            orientation: "auto",//日期控件显示位置
+            startView: "months",//默认显示视图：months、years、centuries，可选
+            minViewMode: "months",//最小显示视图
+            keyboardNavigation: false,
+            autoclose: true,
+            todayHighlight: true
+        });
+    </script>
+
+
+    <div>
+        <form>
+            <table style="margin: auto">
+                <div><span style="font-size:20px;">新增数据:</span></div>
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="text" name="date_f"
+                                   value="{{date_f}}"
+                                   style="display: none;">
+                        </th>
+                        <th class="datepicker-inline">
+                            <input type="text" placeholder="日期" class="form-control picker"
+                           name='date'
+                           value="{{dt.month}}_{{dt.day}}" >
+                        </th>
+                        <th class="datepicker-inline">
+                            <input type="text" placeholder="用途" class="form-control picker"
+                           name='name' >
+                        </th>
+                        <th class="datepicker-inline">
+                            <input type="text" placeholder="金额（元）" class="form-control picker"
+                           name='payment' >
+                        </th>
+                        <th class="datepicker-inline">
+                            <textarea type="text" placeholder="备注" class="form-control picker"
+                              name='note' style="height: 34px;resize: none"></textarea>
+                        </th>
+                        <th class="datepicker-inline">
+                            &emsp;&emsp;
+                            <input id="eat" type="radio" name="type"
+                                   checked value="eat">
+                            <label for="eat">饮食</label>&emsp;
+                            <input id="other" type="radio" name="type"
+                                   value="other">
+                            <label for="other">其他</label>
+                        </th>
+                        <th class="datepicker-inline">
+                            <input id="add" type="submit" value="提交"
+                                   class="input-group form-control picker" >
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+        </form>
+    </div>
+
+</div>
+
+<div class="container" style="padding: 10px; ">
+    <table id="table" data-row-style="rowStyle" data-flat="true"
+           data-virtual-scroll="true"
+           data-height="803" data-pagination="true"
+           data-page-size="25"></table>
+    <!--        <table id="table"  class=“table table-sm table-hover” data-row-style="rowStyle" data-flat="true" data-show-toggle="true" data-virtual-scroll="true" ></table>-->
+    <script type='text/javascript'>
+
+        $(function () {
+            var data = {{data}}
+            var columns = {{columns}}
+            if (data.length == 0) {
+                alert('所选择的日期未维护账单记录！');
+                return
+            }
+            $('#table').bootstrapTable({
+                data: data,
+                columns: columns,
+                striped: 'true',
+            });
+
+        });
+    </script>
+</div>
+
+<script src="{% static 'index/update_date_validate.js' %}"></script>
+
+{% endblock %}
