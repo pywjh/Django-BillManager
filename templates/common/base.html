@@ -7,6 +7,7 @@
 
     <script type='text/javascript' src="{% static 'js/common/jquery.js' %}"></script>
 
+
     <script type="text/javascript" src="{% static 'js/common/bootstrap.js' %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'css/common/bootstrap.css' %}">
 
@@ -28,25 +29,26 @@
     <script src="{% static 'js/common/bootstrap-editable.js' %}"></script>
     <script src="{% static 'js/common/common.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/common/common.css' %}">
-    <link rel="stylesheet" href="{% static 'css/common/bootstrap-editable.css' %}>
+    <link rel="stylesheet" href="{% static 'css/common/bootstrap-editable.css' %}">
 
 
 </head>
 <body style="background: cornsilk">
-<div id="header" class="container navbar-fixed-top" style="font-size:20px;padding: 10px;">
-    <a href="/index">首页</a>
-    <a href="/details">账单明细</a>
-    <a href="/category_statistics">月度收支</a>
-    <a href="/annual">年度收支</a>
-    <a href="/statistics">统计</a>
-    <a href="/search">详情</a>
-    <a href="{% url 'index:update' %}">数据录入</a>
-    <button onclick="javascript:window.print()" style="margin-left: 60px" class="btn button">打印</button>
-</div>
-<div style="padding-top: 50px">
+    <div id="header" class="container navbar-fixed-top" style="font-size:20px;padding: 10px;">
+        <a href="{% url 'index:index' %}">首页</a>
+        <a href="/details">账单明细</a>
+        <a href="/category_statistics">月度收支</a>
+        <a href="/annual">年度收支</a>
+        <a href="/statistics">统计</a>
+        <a href="/search">详情</a>
+        <a href="{% url 'index:update' %}">数据录入</a>
+        <button onclick="javascript:window.print()" style="margin-left: 60px" class="btn button">打印</button>
+    </div>
+    <div style="padding-top: 50px">
 
-</div>
-{% block content %} {% endblock %}
-<script src="{% static 'js/common/cat_widget.js' %}"></script>
+    </div>
+    {% block content %} {% endblock %}
+    <script src="{% static 'js/common/cat_widget.js' %}"></script>
 </body>
+
 </html>

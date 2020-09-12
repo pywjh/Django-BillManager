@@ -1,9 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>index</title>
-</head>
-<body>
-</body>
-</html>
+{% extends "common/base.html"%}
+
+
+{% block content %}
+<div style="position: fixed;top: 100px;right: 100px">
+    <img src="{% static '/img/paid_limit.png'%}">
+    <span style="position: fixed;top: 200px;right: 84px;text-shadow: 1px 1px black;font-size: 20px">今日可用：￥{{paid_limit}}</span>
+</div>
+
+<div class="container" style="padding: 10px; ">
+    <div id="chart" style="width:1200px; height:600px;"></div>
+    <script>
+        $(function () {
+                var chart = echarts.init(document.getElementById('chart'), 'white', {renderer: 'canvas'});
+
+                chart.setOption({{bar|safe}})
+        })
+    </script>
+
+    {% include 'index/status_table.html' %}
+
+    <div id="chart_usage" style="width:1200px; height:600px;"></div>
+    <script>
+        $(function () {
+            var chart = echarts.init(document.getElementById('chart_usage'), 'white', {renderer: 'canvas'});
+            chart.setOption({{pie|safe}});
+        })
+    </script>
+
+</div>
+{% endblock %}

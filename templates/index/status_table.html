@@ -1,0 +1,17 @@
+<script type='text/javascript'>
+    $(window).load(function (){
+        var data = {{data|safe}};
+        var columns = {{columns|safe}};
+
+        $(function () {
+            $('#table').bootstrapTable({
+                data: data,
+                columns: columns,
+                striped: true,
+            });
+        });
+    });
+</script>
+<div class="container" style="width: 80%;padding: 10px;">
+    <table id="table"></table>
+</div>

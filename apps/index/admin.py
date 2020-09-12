@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BillModel, DayDetailModel
+from .models import BillModel, DayDetailModel, SalaryDayModel
 
 admin.site.site_title = '账单管理后台'
 admin.site.site_header = '我的账单'
@@ -23,3 +23,9 @@ class BillModelAdmin(admin.ModelAdmin):
 class DayDetailAdmin(admin.ModelAdmin):
     list_display = ['date', 'name', 'amount', 'type', 'note']
     search_fields = ['date', 'name', 'type', 'note']
+
+
+@admin.register(SalaryDayModel)
+class DayDetailAdmin(admin.ModelAdmin):
+    list_display = ['start_date', 'end_date', 'company', 'day']
+    search_fields = ['company']
