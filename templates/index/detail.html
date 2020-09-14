@@ -1,0 +1,94 @@
+{% extends "common/base.html"%}
+
+
+{% block content %}
+
+<div class="container" style="padding: 10px; ">
+
+    <form action="{% url 'index:detail' %}" method="post">
+        {% csrf_token %}
+        <div class="input-group" style="width: 200px;padding: 10px;">
+            <input type="text" placeholder="账单月" class="form-control picker"
+                   name='month' value="{{month}}">
+            <input type="submit" value="确认">
+        </div>
+    </form>
+
+    <script type="text/javascript">
+        $(".picker").datepicker({
+            format: "yyyy-mm",
+            todayBtn: "linked",
+            language: "zh-CN",
+            orientation: "auto",//日期控件显示位置
+            startView: "months",//默认显示视图：months、years、centuries，可选
+            minViewMode: "months",//最小显示视图
+            keyboardNavigation: false,
+            autoclose: true,
+            todayHighlight: true
+        });
+    </script>
+</div>
+
+
+<div class="container" style="padding: 10px; ">
+    <div id="chart" style="width:1200px; height:600px;"></div>
+</div>
+<script>
+    $(
+        function () {
+            var chart = echarts.init(document.getElementById('chart'), 'white', {renderer: 'canvas'});
+            chart.setOption({{line|safe}});
+        }
+    )
+
+</script>
+
+<div class="container" style="padding: 10px; ">
+<!--    <table id="table" data-row-style="rowStyle" data-flat="true"-->
+<!--           data-show-toggle="true" data-virtual-scroll="true"-->
+<!--           data-height="1000" data-pagination="true"-->
+<!--           data-page-size="25"></table>-->
+    <table id="table" data-row-style="rowStyle"
+            data-show-toggle="true"></table>
+    <script type='text/javascript'>
+
+        $(function () {
+            var data = {{data|safe}}
+            var columns = {{columns|safe}}
+            if (data.length == 0) {
+                alert('所选择的日期未维护账单记录！');
+                return
+            }
+            $('#table').bootstrapTable({
+                data: data,
+                columns: columns,
+                striped: 'true',
+            });
+
+        });
+
+
+    </script>
+    <script>
+        function rowStyle(row, index) {
+            var classes = [
+                'bg-blue',
+                'bg-green',
+                'bg-orange',
+                'bg-yellow',
+                'bg-red',
+                'bg-teal',
+            ];
+
+            if (row.type == "eat") {
+                return {classes: 'bg-teal'}
+            } else if (row.type == 'other') {
+                return {classes: 'bg-blue'}
+            }
+            return {classes: 'bg-gray'}
+        }
+    </script>
+
+</div>
+
+{% endblock %}

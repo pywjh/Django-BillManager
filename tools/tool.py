@@ -7,7 +7,7 @@
 import datetime
 import logging
 
-from django.db.models import Count, Max, Min, Avg, Sum
+from django.db.models import Sum
 from django.utils.timezone import localdate
 from django.utils.dateformat import DateFormat
 from index.models import BillModel, DayDetailModel, SalaryDayModel
@@ -36,21 +36,31 @@ def get_remaining_days(date=localdate()):
     return objective_day - date.day
 
 
-def get_sure_month_bill(date=localdate()):
+def get_sure_month_bill(date=None):
     """
     获取准确的月份（由发薪日控制）
     :param date: date类型时间
     :return: 对应时间的总账
     """
-    year = DateFormat(date).Y()
-    month = DateFormat(date).n()
-    day = DateFormat(date).j()
+    if not date:
+        date = localdate()
+        year = DateFormat(date).Y()
+        month = DateFormat(date).n()
+        day = DateFormat(date).j()
 
-    objective_day = get_objective_day(date)
+        objective_day = get_objective_day(date)
 
-    month = month - 1 or 12 if day < objective_day else month
+        if not objective_day:
+            return BillModel.objects.first()
 
-    return BillModel.objects.get(date=f"{year}-{month}-{objective_day}")
+        month = month - 1 or 12 if day < objective_day else month
+        return BillModel.objects.get(date=f"{year}-{month}-{objective_day}")
+
+    else:
+        bill_id = BillModel.objects.filter(date__gte=date).order_by('date').first()
+        if not bill_id:
+            return BillModel.objects.first()
+        return bill_id
 
 
 def get_paid_limit():
@@ -62,8 +72,8 @@ def get_paid_limit():
     return round((bill_id.budget - total_cost) / remaining_days, 2)
 
 
-def get_current_x():
-    bill_id = get_sure_month_bill()
+def get_current_x(date=None):
+    bill_id = get_sure_month_bill(date)
     x_date = sorted(
         list(set([date.date for date in bill_id.day_detail.only('date')])),
         key=lambda m: datetime.datetime(m.year, m.month, m.day),
@@ -71,11 +81,11 @@ def get_current_x():
     return x_date
 
 
-def get_current_y():
+def get_current_y(date=None):
     y_eat = [('饮食', [])]
     y_other = [('其他', [])]
     y_all = [('全部', [])]
-    x_date = get_current_x()
+    x_date = get_current_x(date)
     for date in x_date:
         eat_amount = DayDetailModel.objects.filter(date=date, type='eat').aggregate(sum=Sum('amount'))['sum'] or 0
         other_amount = DayDetailModel.objects.filter(date=date, type='other').aggregate(sum=Sum('amount'))['sum'] or 0
@@ -115,13 +125,13 @@ def get_table_info():
     return status, columns
 
 
-def get_index_pie():
+def get_index_pie(date=None):
     """
     网站首页饼状图
     :return:
         data -> list [(title1, num1), (title2, num2)]
     """
-    bill_id = get_sure_month_bill()
+    bill_id = get_sure_month_bill(date)
     payment = round(bill_id.day_detail.aggregate(sum=Sum('amount'))['sum'] or 0, 2)
     surplus = round(bill_id.budget - payment, 2)
     if surplus < 0:
@@ -129,3 +139,5 @@ def get_index_pie():
 
     rest_out = [('结余', surplus), ('支出', payment)]
     return rest_out, bill_id.budget
+
+

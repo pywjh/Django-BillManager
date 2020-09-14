@@ -36,12 +36,13 @@
 <body style="background: cornsilk">
     <div id="header" class="container navbar-fixed-top" style="font-size:20px;padding: 10px;">
         <a href="{% url 'index:index' %}">首页</a>
-        <a href="/details">账单明细</a>
+        <a href="/detail">账单明细</a>
         <a href="/category_statistics">月度收支</a>
         <a href="/annual">年度收支</a>
         <a href="/statistics">统计</a>
         <a href="/search">详情</a>
         <a href="{% url 'index:update' %}">数据录入</a>
+        <a href="/admin/">后台</a>
         <button onclick="javascript:window.print()" style="margin-left: 60px" class="btn button">打印</button>
     </div>
     <div style="padding-top: 50px">
