@@ -13,7 +13,7 @@ from django.utils.dateformat import DateFormat
 from index.models import BillModel, DayDetailModel, SalaryDayModel
 
 
-def get_objective_day(date):
+def get_objective_day(date) -> int:
     """获取准确的发薪日期"""
     objective = SalaryDayModel.objects.filter(
         start_date__lte=date,
@@ -24,19 +24,19 @@ def get_objective_day(date):
         return objective.day
 
 
-def get_remaining_days(date=localdate()):
+def get_remaining_days(date=localdate()) -> int:
     """
     返回根据发薪日，来控制的截止时间（到发薪日还有多少天）
     """
     objective_day = get_objective_day(date)
-    current_month_max_day = DateFormat(date).t()
+    current_month_max_day = int(DateFormat(date).t())
 
     if date.day >= objective_day:
         return current_month_max_day - date.day + objective_day
     return objective_day - date.day
 
 
-def get_sure_month_bill(date=None):
+def get_sure_month_bill(date=None) -> BillModel:
     """
     获取准确的月份（由发薪日控制）
     :param date: date类型时间
@@ -63,7 +63,10 @@ def get_sure_month_bill(date=None):
         return bill_id
 
 
-def get_paid_limit():
+def get_paid_limit() -> float:
+    """
+    获取日付上线金额
+    """
     bill_id = get_sure_month_bill()
     # 本月消费
     total_cost = sum(map(lambda d: d.get('amount', 0), bill_id.day_detail.all().values('amount')))
@@ -72,7 +75,10 @@ def get_paid_limit():
     return round((bill_id.budget - total_cost) / remaining_days, 2)
 
 
-def get_current_x(date=None):
+def get_current_x(date=None) -> list:
+    """
+    获取统计图的x轴
+    """
     bill_id = get_sure_month_bill(date)
     x_date = sorted(
         list(set([date.date for date in bill_id.day_detail.only('date')])),
@@ -81,7 +87,11 @@ def get_current_x(date=None):
     return x_date
 
 
-def get_current_y(date=None):
+def get_current_y(date=None) -> list:
+    """
+    获取统计图的y轴
+    return: [('title', [1,2,3,4]), ('title', [1,2,3,4])]
+    """
     y_eat = [('饮食', [])]
     y_other = [('其他', [])]
     y_all = [('全部', [])]
@@ -95,7 +105,10 @@ def get_current_y(date=None):
     return y_eat + y_other + y_all
 
 
-def get_table_info():
+def get_table_info() -> tuple:
+    """
+    首页小表格
+    """
     bill_id = get_sure_month_bill()
     columns = [
         {
@@ -125,7 +138,7 @@ def get_table_info():
     return status, columns
 
 
-def get_index_pie(date=None):
+def get_index_pie(date=None) -> tuple:
     """
     网站首页饼状图
     :return:
@@ -139,5 +152,47 @@ def get_index_pie(date=None):
 
     rest_out = [('结余', surplus), ('支出', payment)]
     return rest_out, bill_id.budget
+
+
+def to_detail_table(date):
+    """
+    详情页的详细消费信息
+    """
+    bill_id = get_sure_month_bill(date)
+    bills = []
+    columns = [
+        {
+            "field": "date",  # which is the field's name of data key
+            "title": "日期",  # display as the table header's name
+            "sortable": 'false',
+        },
+        {
+            "field": "name",
+            "title": "用途",
+            "sortable": 'false',
+        },
+        {
+            "field": "amount",
+            "title": "金额（元）",
+            "sortable": 'false',
+        },
+        {
+            "field": "note",
+            "title": "备注",
+            "sortable": 'false',
+        },
+    ]
+    detail_data = bill_id.day_detail.all().order_by('date')
+    for data in detail_data:
+        bills.append({
+            'date': DateFormat(data.date).c(),
+            'name': data.name,
+            'amount': data.amount,
+            'note': data.note,
+            'type': data.type,
+        })
+    return bills, columns
+
+
 
 

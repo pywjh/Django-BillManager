@@ -56,6 +56,8 @@ class DetailView(View):
             yaxis=tool.get_current_y(date),
             title=f"{tool.get_sure_month_bill(date)}总消费:{tool.get_index_pie(date)[0][1][1]}",  # pie里面有需要的数据
         ).dump_options()
+        #  table
+        data, columns = tool.to_detail_table(date)
         return render(request, 'index/detail.html', locals())
 
     def post(self, request):

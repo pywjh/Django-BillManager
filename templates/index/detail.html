@@ -55,10 +55,10 @@
         $(function () {
             var data = {{data|safe}}
             var columns = {{columns|safe}}
-            if (data.length == 0) {
-                alert('所选择的日期未维护账单记录！');
-                return
-            }
+<!--            if (data.length == 0) {-->
+<!--                alert('所选择的日期未维护账单记录！');-->
+<!--                return-->
+<!--            }-->
             $('#table').bootstrapTable({
                 data: data,
                 columns: columns,
