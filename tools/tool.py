@@ -106,11 +106,11 @@ def get_current_y(date=None) -> list:
     return y_eat + y_other + y_all
 
 
-def get_table_info(month=None) -> tuple:
+def get_table_info(date=None, month=None) -> tuple:
     """
     首页小表格
     """
-    bill_id = get_sure_month_bill()
+    bill_id = get_sure_month_bill(date)
     columns = [
         {
             "field": "name",  # which is the field's name of data key

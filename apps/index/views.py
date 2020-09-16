@@ -84,7 +84,7 @@ class MonthlyPaymentsView(View):
             outer_title=f'{date.year}年{date.month}其他报表'
         ).dump_options()
         # 表格
-        data, columns = tool.get_table_info(month=True)
+        data, columns = tool.get_table_info(date=date, month=True)
         return render(request, 'index/month.html', locals())
 
     def post(self, request):
