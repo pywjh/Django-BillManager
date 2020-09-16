@@ -10,6 +10,7 @@ import logging
 from django.db.models import Sum
 from django.utils.timezone import localdate
 from django.utils.dateformat import DateFormat
+
 from index.models import BillModel, DayDetailModel, SalaryDayModel
 
 
@@ -105,7 +106,7 @@ def get_current_y(date=None) -> list:
     return y_eat + y_other + y_all
 
 
-def get_table_info() -> tuple:
+def get_table_info(month=None) -> tuple:
     """
     首页小表格
     """
@@ -135,6 +136,13 @@ def get_table_info() -> tuple:
         {'name': '月储金额', 'balance': bill_id.save_amount},
         {'name': '本月结余', 'balance': round((bill_id.salary - payment - bill_id.rent), 2)},
     ]
+    if month:
+        status.insert(
+            1, {'name': '饮食支出', 'balance': round(bill_id.day_detail.filter(type='eat').aggregate(sum=Sum('amount'))['sum'] or 0, 2)}
+        )
+        status.insert(
+            2, {'name': '其他支出', 'balance': round(bill_id.day_detail.filter(type='other').aggregate(sum=Sum('amount'))['sum'] or 0, 2)}
+        )
     return status, columns
 
 
@@ -194,5 +202,29 @@ def to_detail_table(date):
     return bills, columns
 
 
-
-
+def get_category_amount(date):
+    """
+    饼状统计图
+    """
+    bill_id = get_sure_month_bill(date)
+    eat_list = []
+    other_list = []
+    eat_name = set([i['name'] for i in bill_id.day_detail.filter(type='eat').values('name')])
+    other_name = set([i['name'] for i in bill_id.day_detail.filter(type='other').values('name')])
+    for name in eat_name:
+        eat_list.append(
+            (name,
+                sum(map(
+                        lambda d: d.get('amount', 0),
+                        bill_id.day_detail.filter(name=name, type='eat').values('amount'))
+                )))
+    for name in other_name:
+        other_list.append(
+            (name,
+                sum(map(
+                        lambda d: d.get('amount', 0),
+                        bill_id.day_detail.filter(name=name, type='other').values('amount'))
+                )))
+    eat_list.sort(key=lambda t: t[1], reverse=True)
+    other_list.sort(key=lambda t: t[1], reverse=True)
+    return eat_list, other_list

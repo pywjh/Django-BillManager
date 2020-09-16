@@ -27,7 +27,6 @@
 
     <script src="{% static 'js/common/bootstrap-table-editable.js' %}"></script>
     <script src="{% static 'js/common/bootstrap-editable.js' %}"></script>
-    <script src="{% static 'js/common/common.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/common/common.css' %}">
     <link rel="stylesheet" href="{% static 'css/common/bootstrap-editable.css' %}">
 
@@ -36,8 +35,8 @@
 <body style="background: cornsilk">
     <div id="header" class="container navbar-fixed-top" style="font-size:20px;padding: 10px;">
         <a href="{% url 'index:index' %}">首页</a>
-        <a href="/detail">账单明细</a>
-        <a href="/category_statistics">月度收支</a>
+        <a href="{% url 'index:detail' %}">账单明细</a>
+        <a href="{% url 'index:month' %}">月度收支</a>
         <a href="/annual">年度收支</a>
         <a href="/statistics">统计</a>
         <a href="/search">详情</a>
@@ -50,6 +49,8 @@
     </div>
     {% block content %} {% endblock %}
     <script src="{% static 'js/common/cat_widget.js' %}"></script>
+    <script src="{% static 'js/common/common.js' %}"></script>
+</body>
 </body>
 
 </html>

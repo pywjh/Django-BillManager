@@ -1,0 +1,44 @@
+{% extends "common/base.html"%}
+
+
+{% block content %}
+
+<div class="container" style="padding: 10px; ">
+
+    <form action="{% url 'index:month' %}" method="post">
+        {% csrf_token %}
+        <div class="input-group" style="width: 200px;padding: 10px;">
+            <input type="text" placeholder="账单月" class="form-control picker"
+                   name='month' value="{{month}}">
+            <input type="submit" value="确认">
+        </div>
+    </form>
+
+    <script type="text/javascript">
+        $(".picker").datepicker({
+            format: "yyyy-mm",
+            todayBtn: "linked",
+            language: "zh-CN",
+            orientation: "auto",//日期控件显示位置
+            startView: "months",//默认显示视图：months、years、centuries，可选
+            minViewMode: "months",//最小显示视图
+            keyboardNavigation: false,
+            autoclose: true,
+            todayHighlight: true
+        });
+    </script>
+
+
+    <div id="chart_usage" style="width:1200px; height:600px;"></div>
+    <script>
+        $(function () {
+            var chart = echarts.init(document.getElementById('chart_usage'), 'white', {renderer: 'canvas'});
+            chart.setOption({{line|safe}});
+        })
+    </script>
+
+    {% include 'index/status_table.html' %}
+
+</div>
+
+{% endblock %}

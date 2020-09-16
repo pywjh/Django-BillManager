@@ -4,6 +4,7 @@ from django.views import View
 from django.shortcuts import render, redirect, reverse
 from django.utils import dateformat, timezone
 
+from django.conf import settings
 from tools import tool, draw
 
 # Create your views here.
@@ -45,9 +46,10 @@ class DetailView(View):
     """
     详情页
     """
-    def get(self, request, month=''):
+    def get(self, request):
         # 条形图
-        date = month and datetime.strptime(month, '%Y-%m') or None
+        month = request.session.get('month', '')
+        date = month and datetime.strptime(month, '%Y-%m') or ''
         line = draw.draw_balance_line(
             xaxis=[
                 f"{date.strftime('%m月%d日')}({dateformat.DateFormat(date).D()[-1]})"
@@ -62,7 +64,33 @@ class DetailView(View):
 
     def post(self, request):
         month = request.POST.get('month')
-        return redirect(reverse('index:detail_month', kwargs={'month': month}))
+        request.session['month'] = month
+        return redirect(reverse('index:detail'))
+
+
+class MonthlyPaymentsView(View):
+    """
+    月度收支 页
+    """
+    def get(self, request):
+        # 条形图
+        month = request.session.get('month', '')
+        date = month and datetime.strptime(month, '%Y-%m') or ''
+        inner, outside = tool.get_category_amount(date)
+        line = draw.draw_category_pie(
+            inner=inner[:settings.NUMBER_WEB_CATEGORY_PIE_EAT],
+            outside=outside[:settings.NUMBER_WEB_CATEGORY_PIE_OTHER],
+            inner_title=f'{date.year}年{date.month}饮食报表',
+            outer_title=f'{date.year}年{date.month}其他报表'
+        ).dump_options()
+        # 表格
+        data, columns = tool.get_table_info(month=True)
+        return render(request, 'index/month.html', locals())
+
+    def post(self, request):
+        month = request.POST.get('month', '')
+        request.session['month'] = month
+        return redirect(reverse('index:month'))
 
 
 class UpdateView(View):
