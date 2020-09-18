@@ -7,7 +7,7 @@
 import datetime
 import logging
 
-from django.db.models import Sum
+from django.db.models import Count, Sum, Avg
 from django.utils.timezone import localdate
 from django.utils.dateformat import DateFormat
 
@@ -162,7 +162,7 @@ def get_index_pie(date=None) -> tuple:
     return rest_out, bill_id.budget
 
 
-def to_detail_table(date):
+def to_detail_table(date) -> tuple:
     """
     详情页的详细消费信息
     """
@@ -202,7 +202,7 @@ def to_detail_table(date):
     return bills, columns
 
 
-def get_category_amount(date):
+def get_category_amount(date) -> tuple:
     """
     饼状统计图
     """
@@ -228,3 +228,78 @@ def get_category_amount(date):
     eat_list.sort(key=lambda t: t[1], reverse=True)
     other_list.sort(key=lambda t: t[1], reverse=True)
     return eat_list, other_list
+
+
+def annual(year):
+    """
+    年度收支
+    """
+    if not year:
+        year = localdate().year
+
+    bills = BillModel.objects.filter(date__year=year).order_by('date')
+
+    # 表格
+    total_salary = round(bills.aggregate(total=Sum('salary')).get('total', 0), 2)
+    total_eat = round(sum([bill.day_detail.filter(type='eat').aggregate(total=Sum('amount'))['total'] for bill in bills]), 2)
+    total_other = round(sum([bill.day_detail.filter(type='other').aggregate(total=Sum('amount'))['total'] for bill in bills]), 2)
+    total_rent = round(bills.aggregate(total=Sum('rent')).get('total', 0), 2)
+    total_cost = round((total_eat + total_other), 2)
+    total_cost_all = round((total_rent + total_cost), 2)
+    annual_earnings = round((total_salary - total_cost_all), 2)
+
+    # 条形图
+    bar_x = [date.strftime('%Y年%m月') for date in bills.values_list('date', flat=True)]
+    bar_expend_y = [('支出', [round(bill.day_detail.aggregate(total=Sum('amount'))['total'], 2) for bill in bills])]
+    bar_income_y = [('收入', [bill.salary for bill in bills])]
+
+    # 辅助线
+    mark_line = round(bills.aggregate(budget_avg=Avg('budget'))['budget_avg'], 2)
+
+    # 饼状图
+    eat_list = []
+    other_list = []
+    for bill in bills:
+        eat, other = get_category_amount(bill.date)
+        eat_list.extend(eat)
+        other_list.extend(other)
+
+    eat_list.sort(key=lambda t: t[1], reverse=True)
+    other_list.sort(key=lambda t: t[1], reverse=True)
+
+    result = {
+        'total_salary': total_salary,  # 年度总工资
+        'total_eat': total_eat,  # 年度总饮食消费
+        'total_other': total_other,  # 年度总其他消费
+        'total_rent': total_rent,  # 年度总房租消费
+        'total_cost': total_cost,  # 年度总吃穿用消费
+        'total_cost_all': total_cost_all,  # 年度所有消费
+        'annual_earnings': annual_earnings,  # 年度总盈亏
+        'columns': [
+            {
+                "field": "name",  # which is the field's name of data key
+                "title": "名称",  # display as the table header's name
+                "sortable": 'false',
+            },
+            {
+                "field": "balance",
+                "title": "金额 (元)",
+                "sortable": 'false',
+            },
+        ],  # 表格标题
+        'status': [
+            {'name': f'{year}年收入金额', 'balance': "{:,}".format(total_salary)},
+            {'name': f'{year}年饮食金额', 'balance': "{:,}".format(total_eat)},
+            {'name': f'{year}年其他金额', 'balance': "{:,}".format(total_other)},
+            {'name': f'{year}年吃穿金额', 'balance': "{:,}".format(total_cost)},
+            {'name': f'{year}年租金金额', 'balance': "{:,}".format(total_rent)},
+            {'name': f'{year}年支出金额', 'balance': "{:,}".format(total_cost_all)},
+            {'name': f'{year}年盈亏金额', 'balance': "{:,}".format(annual_earnings)},
+        ],  # 表格内容
+        'bar_x': bar_x,  # 条形图x轴
+        'bar_y': bar_expend_y+bar_income_y,  # 条形图y轴
+        'markline': mark_line,  # 年度统计图辅助线
+        'eat_list': eat_list,  # 年度饼状图eat，内圈
+        'other_list': other_list,  # 年度饼状图other，外圈
+    }
+    return result

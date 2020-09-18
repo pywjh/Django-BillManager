@@ -5,7 +5,9 @@ from django.shortcuts import render, redirect, reverse
 from django.utils import dateformat, timezone
 
 from django.conf import settings
-from tools import tool, draw
+from tools import draw
+import tool
+
 
 # Create your views here.
 
@@ -91,6 +93,34 @@ class MonthlyPaymentsView(View):
         month = request.POST.get('month', '')
         request.session['month'] = month
         return redirect(reverse('index:month'))
+
+
+class AnnualPaymentsView(View):
+    """
+    年度收支
+    """
+    def get(self, request):
+        year = request.session.get('year', '')
+        result = tool.annual(year)
+        columns = result.get('columns')  # 表格标题
+        data = result.get('status', [])  # 表格内容
+        annual_earnings = "{:,}".format(result.get('annual_earnings', 0))  # 年度收益
+        annual_bar = draw.draw_balance_bar(
+            xaxis=result.get('bar_x', []),
+            yaxis=result.get('bar_y', []),
+            title=f'{year}年年度收支',
+            markline=result.get('markline', 0)
+        ).dump_options()  # 年度条形图
+        annual_pie = draw.draw_category_pie(
+            inner=result.get('eat_list')[:settings.NUMBER_WEB_CATEGORY_PIE_EAT],
+            outside=result.get('other_list')[:settings.NUMBER_WEB_CATEGORY_PIE_OTHER],
+        ).dump_options()
+        return render(request, 'index/annual.html', locals())
+
+    def post(self, request):
+        year = request.POST.get('year')
+        request.session['year'] = year
+        return redirect(reverse('index:annual'))
 
 
 class UpdateView(View):

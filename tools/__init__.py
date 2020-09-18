@@ -5,4 +5,3 @@
 # FILE: __init__.py
 # ========================================
 from . import draw
-from . import tool

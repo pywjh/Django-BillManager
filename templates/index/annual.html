@@ -1,0 +1,65 @@
+{% extends "common/base.html"%}
+
+
+{% block content %}
+<div style="position: fixed;top: 100px;right: 100px">
+    <img src="{% static '/img/annual_earnings.png' %}">
+    <span style="position: fixed;top: 230px;right: 80px;text-shadow: 1px 1px black;font-size: 20px">年度收益: ￥{{annual_earnings}}</span>
+</div>
+
+<div class="container" style="padding: 10px; ">
+    <form action="{% url 'index:annual' %}" method="post">
+        {% csrf_token %}
+        <div class="input-group" style="width: 200px;padding: 10px;">
+            <input type="text" placeholder="账单年" class="form-control bar_picker" name='year' value="{{year}}">
+            <input type="submit" value="确认">
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+        $(".bar_picker").datepicker({
+            format: "yyyy",
+            todayBtn: "linked",
+            language: "zh-CN",
+            orientation: "auto",//日期控件显示位置
+            startView:"years",//默认显示视图：months、years、centuries，可选
+            minViewMode:"years",//最小显示视图
+            keyboardNavigation: false,
+            autoclose: true,
+            todayHighlight: true
+        });
+
+</script>
+
+<div class="container" style="padding: 10px; ">
+    <div id="chart" style="width:1200px; height:600px;"></div>
+    <script>
+        $(
+            function () {
+                var chart = echarts.init(document.getElementById('chart'), 'white', {renderer: 'canvas'});
+                chart.setOption({{annual_bar|safe}});
+            }
+        )
+    </script>
+
+    <hr>
+    <div id="pie_chart" style="width:1200px; height:600px;"></div>
+    <script>
+        $(
+            function () {
+                var chart = echarts.init(document.getElementById('pie_chart'), 'white', {renderer: 'canvas'});
+                chart.setOption({{annual_pie|safe}});
+            }
+        )
+
+    </script>
+
+
+    <hr>
+
+    {% include 'index/status_table.html' %}
+
+
+</div>
+
+{% endblock %}
