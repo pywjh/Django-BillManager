@@ -303,8 +303,8 @@ def annual(year) -> dict:
         'bar_x': bar_x,  # 条形图x轴
         'bar_y': bar_expend_y+bar_income_y,  # 条形图y轴
         'markline': mark_line,  # 年度统计图辅助线
-        'eat_list': eat_list,  # 年度饼状图eat，内圈
-        'other_list': other_list,  # 年度饼状图other，外圈
+        'eat_list': list(map(lambda t: (t[0], round(t[1], 2)), eat_list)),  # 年度饼状图eat，内圈
+        'other_list': list(map(lambda t: (t[0], round(t[1], 2)), other_list)),  # 年度饼状图other，外圈
     }
     return result
 
