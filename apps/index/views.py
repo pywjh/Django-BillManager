@@ -59,10 +59,13 @@ class DetailView(View):
                 for date in tool.get_current_x(date)
             ],
             yaxis=tool.get_current_y(date),
-            title=f"{tool.get_sure_month_bill(date)}总消费:{tool.get_index_pie(date)[0][1][1]}",  # pie里面有需要的数据
+            title=f"消费统计图",  # pie里面有需要的数据
         ).dump_options()
         #  table
         data, columns = tool.to_detail_table(date)
+        # 月消费合计
+        month_expend = "{:,}".format(tool.get_index_pie(date)[0][1][1])
+        month = tool.get_sure_month_bill(date)
         return render(request, 'index/detail.html', locals())
 
     def post(self, request):
@@ -88,6 +91,9 @@ class MonthlyPaymentsView(View):
         ).dump_options()
         # 表格
         data, columns = tool.get_table_info(date=date, month=True)
+        # 月消费合计
+        month_expend = "{:,}".format(tool.get_index_pie(date)[0][1][1])
+        month = tool.get_sure_month_bill(date)
         return render(request, 'index/month.html', locals())
 
     def post(self, request):
@@ -105,17 +111,18 @@ class AnnualPaymentsView(View):
         result = tool.annual(year)
         columns = result.get('columns')  # 表格标题
         data = result.get('status', [])  # 表格内容
-        annual_earnings = "{:,}".format(result.get('annual_earnings', 0))  # 年度收益
-        annual_bar = draw.draw_balance_bar(
-            xaxis=result.get('bar_x', []),
-            yaxis=result.get('bar_y', []),
-            title=f'{year}年年度收支',
-            markline=result.get('markline', 0)
-        ).dump_options()  # 年度条形图
-        annual_pie = draw.draw_category_pie(
-            inner=result.get('eat_list')[:settings.NUMBER_WEB_CATEGORY_PIE_EAT],
-            outside=result.get('other_list')[:settings.NUMBER_WEB_CATEGORY_PIE_OTHER],
-        ).dump_options()
+        if data:
+            annual_earnings = "{:,}".format(result.get('annual_earnings', 0))  # 年度收益
+            annual_bar = draw.draw_balance_bar(
+                xaxis=result.get('bar_x', []),
+                yaxis=result.get('bar_y', []),
+                title=f'{year}年年度收支',
+                markline=result.get('markline', 0)
+            ).dump_options()  # 年度条形图
+            annual_pie = draw.draw_category_pie(
+                inner=result.get('eat_list')[:settings.NUMBER_WEB_CATEGORY_PIE_EAT],
+                outside=result.get('other_list')[:settings.NUMBER_WEB_CATEGORY_PIE_OTHER],
+            ).dump_options()
         return render(request, 'index/annual.html', locals())
 
     def post(self, request):

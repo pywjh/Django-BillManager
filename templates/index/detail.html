@@ -3,6 +3,11 @@
 
 {% block content %}
 
+<div style="position: fixed;top: 100px;right: 100px">
+    <img src="{% static '/img/month_expend.png' %}">
+    <span style="position: fixed;top: 180px;right: 40px;text-shadow: 1px 1px black;font-size: 20px">月消费合计: ￥{{month_expend}}</span>
+</div>
+
 <div class="container" style="padding: 10px; ">
 
     <form action="{% url 'index:detail' %}" method="post">

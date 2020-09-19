@@ -194,9 +194,9 @@ def to_detail_table(date) -> tuple:
     for data in detail_data:
         bills.append({
             'date': DateFormat(data.date).c(),
-            'name': data.name,
-            'amount': data.amount,
-            'note': data.note,
+            'name': data.name or '',
+            'amount': data.amount or 0,
+            'note': data.note or '',
             'type': data.type,
         })
     return bills, columns
@@ -238,6 +238,9 @@ def annual(year) -> dict:
         year = localdate().year
 
     bills = BillModel.objects.filter(date__year=year).order_by('date')
+
+    if not bills:
+        return {}
 
     # 表格
     total_salary = round(bills.aggregate(total=Sum('salary')).get('total', 0), 2)
