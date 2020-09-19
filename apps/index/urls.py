@@ -16,5 +16,6 @@ urlpatterns = [
     path('detail', views.DetailView.as_view(), name='detail'),
     path('month', views.MonthlyPaymentsView.as_view(), name='month'),
     path('annual', views.AnnualPaymentsView.as_view(), name='annual'),
-    path('update', views.UpdateView.as_view(), name='update'),
+    path('statistics', views.StatisticsView.as_view(), name='statistics'),
+    path('search', views.SearchView.as_view(), name='search'),
 ]

@@ -230,7 +230,7 @@ def get_category_amount(date) -> tuple:
     return eat_list, other_list
 
 
-def annual(year):
+def annual(year) -> dict:
     """
     年度收支
     """
@@ -257,15 +257,16 @@ def annual(year):
     mark_line = round(bills.aggregate(budget_avg=Avg('budget'))['budget_avg'], 2)
 
     # 饼状图
-    eat_list = []
-    other_list = []
-    for bill in bills:
-        eat, other = get_category_amount(bill.date)
-        eat_list.extend(eat)
-        other_list.extend(other)
-
-    eat_list.sort(key=lambda t: t[1], reverse=True)
-    other_list.sort(key=lambda t: t[1], reverse=True)
+    eat_list = list(
+                DayDetailModel.objects.filter(
+                    bill_id__date__year=year,
+                    type='eat'
+                ).values('name').annotate(sum=Sum('amount')).order_by('-sum').values_list('name', 'sum'))
+    other_list = list(
+                DayDetailModel.objects.filter(
+                    bill_id__date__year=year,
+                    type='other'
+                ).values('name').annotate(sum=Sum('amount')).order_by('-sum').values_list('name', 'sum'))
 
     result = {
         'total_salary': total_salary,  # 年度总工资
@@ -303,3 +304,65 @@ def annual(year):
         'other_list': other_list,  # 年度饼状图other，外圈
     }
     return result
+
+
+def statistics():
+    # 总收入
+    total_income = round(BillModel.objects.values('salary').aggregate(total=Sum('salary')).get('total', 0), 2)
+    # 总房租
+    total_rent = round(BillModel.objects.values('rent').aggregate(total=Sum('rent')).get('total', 0), 2)
+    # 总消费
+    total_expend = round(DayDetailModel.objects.values('amount').aggregate(total=Sum('amount')).get('total', 0), 2)
+    # 剩余资产
+    total_assets = round(total_income - total_expend - total_rent, 2)
+
+    # 条形图x轴
+    bar_x = list(BillModel.objects.values('date__year').annotate(c=Count('date__year')).order_by('date__year').values_list('date__year', flat=True))
+    # 条形图y轴1
+    bar_income_y = (
+        '收入',
+        [
+            round(BillModel.objects.filter(date__year=year).values('salary').aggregate(total=Sum('salary')).get('total', 0), 2)
+            for year in bar_x
+        ]
+    )
+    # 条形图y轴2
+    bar_expend_y = (
+        '支出',
+        [
+            round(
+                sum(  # 房租和总消费之和
+                    [
+                        BillModel.objects.filter(
+                            date__year=year
+                        ).values('rent').aggregate(total=Sum('rent')).get('total', 0),
+                        DayDetailModel.objects.filter(
+                            date__year=year
+                        ).values('amount').aggregate(total=Sum('amount')).get('total', 0)
+                    ]
+                ),
+                2
+            )
+            for year in bar_x
+        ]
+    )
+    # 折线图
+    line_y = [
+        ('结余', [round(income - expend, 2) for income, expend in zip(bar_income_y[1], bar_expend_y[1])]),
+    ]
+    return {
+        'total_assets': total_assets,
+        'bar_x': bar_x,
+        'bar_y': list([bar_expend_y, bar_income_y]),
+        'line_x': list(map(str, bar_x)),  # 卡了我好久，不是字符串显示不出数据来
+        'line_y': line_y,
+    }
+
+
+def search(year=None):
+    """
+    搜索功能 
+    """
+    if not year:
+        year = localdate().year
+

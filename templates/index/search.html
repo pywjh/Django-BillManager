@@ -1,0 +1,105 @@
+{% extends "common/base.html"%}
+
+{% block content %}
+<div class="container">
+    <form action="{% url 'index:search' %}" method="post">
+        {% csrf_token %}
+        <table class="table" style="margin: auto; padding: 10px">
+            <thead>
+                <tr style="font-size: 20px">
+                    <th class="datepicker-inline">
+                        <input type="radio" id="year" name="type" value="year" checked onclick="show()">
+                        <label for="year">年份</label>
+                    </th>
+                    <th class="datepicker-inline">
+                        <input type="radio" id="all" name="type" value="all" onclick="show()">
+                        <label for="all">全年</label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="text" placeholder="名称/类别" name="word" class="form-control">
+                    </td>
+                    <td class="td-picker">
+                        <input type="text" placeholder="年份" class="form-control picker"
+                               name='{{select_year}}' value="{{today_year}}">
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <input type="submit" class="btn btn-info" value="确认">
+                    </th>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+
+    <script type="text/javascript">
+
+        $(".picker").datepicker({
+            format: "yyyy",
+            todayBtn: "linked",
+            language: "zh-CN",
+            orientation: "auto",//日期控件显示位置
+            startView: "years",//默认显示视图：months、years、centuries，可选
+            minViewMode: "years",//最小显示视图
+            keyboardNavigation: false,
+            autoclose: false,
+            todayHighlight: true
+        });
+    </script>
+
+    <div class="container" style="padding: 10px; ">
+        {% if total %}
+            <h2>总计: {{total}}</h2>
+            <div class="container" style="padding: 10px; ">
+                <div id="chart" style="width:1200px; height:600px;"></div>
+            </div>
+            <script>
+                $(
+                    function () {
+                        var chart = echarts.init(document.getElementById('chart'), 'white', {renderer: 'canvas'});
+                        $.ajax({
+                            type: "GET",
+                            url: "{{ search_line }}",
+                            dataType: 'json',
+                            success: function (result) {
+                                chart.setOption(result);
+                            }
+                        });
+                    }
+                )
+            </script>
+        {% endif %}
+
+        <table id="table" data-row-style="rowStyle">
+        </table>
+
+    <script type='text/javascript'>
+            var data = {{data|safe}}
+            var columns = {{columns|safe}}
+            $('#table').bootstrapTable({
+                data: data,
+                columns: columns,
+                striped: 'true',
+            });
+    </script>
+    </div>
+</div>
+
+<script type='text/javascript'>
+    function show(){
+        let time_type = $('input[name=type]:checked').val()
+        if (time_type === 'all'){
+            $('.td-picker').css('display', 'none');
+        }
+        else {
+            $('.td-picker').css('display', 'block');
+        }
+    }
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "common/base.html"%}
+
+
+{% block content %}
+<div style="position: fixed;top: 100px;right: 100px">
+    <img src="/static/img/total_assets.png">
+    <span style="position: fixed;top: 230px;right: 80px;text-shadow: 1px 1px black;font-size: 20px">剩余资产：{{total_assets}}</span>
+</div>
+
+<div class="container" style="padding: 10px; ">
+    <div id="chart_bar" style="width:1200px; height:600px;"></div>
+    <script>
+        $(
+            function () {
+                var chart = echarts.init(document.getElementById('chart_bar'), 'white', {renderer: 'canvas'});
+                chart.setOption({{bar|safe}});
+            }
+        )
+
+    </script>
+
+    <div id="chart_line" style="width:1200px; height:600px;"></div>
+    <script>
+        $(
+            function () {
+                var chart = echarts.init(document.getElementById('chart_line'), 'white', {renderer: 'canvas'});
+                chart.setOption({{line|safe}});
+            }
+        )
+
+    </script>
+
+    <hr>
+    <h2>剩余资产 : {{ total_assets }} 元</h2>
+</div>
+
+
+{% endblock %}

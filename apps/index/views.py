@@ -3,6 +3,7 @@ from datetime import datetime
 from django.views import View
 from django.shortcuts import render, redirect, reverse
 from django.utils import dateformat, timezone
+from django.utils.timezone import localdate
 
 from django.conf import settings
 from tools import draw
@@ -51,7 +52,7 @@ class DetailView(View):
     def get(self, request):
         # 条形图
         month = request.session.get('month', '')
-        date = month and datetime.strptime(month, '%Y-%m') or ''
+        date = month and datetime.strptime(month, '%Y-%m') or localdate()
         line = draw.draw_balance_line(
             xaxis=[
                 f"{date.strftime('%m月%d日')}({dateformat.DateFormat(date).D()[-1]})"
@@ -77,7 +78,7 @@ class MonthlyPaymentsView(View):
     def get(self, request):
         # 条形图
         month = request.session.get('month', '')
-        date = month and datetime.strptime(month, '%Y-%m') or ''
+        date = month and datetime.strptime(month, '%Y-%m') or localdate()
         inner, outside = tool.get_category_amount(date)
         line = draw.draw_category_pie(
             inner=inner[:settings.NUMBER_WEB_CATEGORY_PIE_EAT],
@@ -123,10 +124,36 @@ class AnnualPaymentsView(View):
         return redirect(reverse('index:annual'))
 
 
-class UpdateView(View):
+class StatisticsView(View):
+    """
+    统计
+    """
     def get(self, request):
-        today = dateformat.DateFormat(timezone.localdate()).c()
-        return render(request, 'index/update.html', locals())
+        result = tool.statistics()
+        total_assets = "{:,}".format(result['total_assets'])
+        bar = draw.draw_balance_bar(
+            xaxis=result['bar_x'],
+            yaxis=result['bar_y'],
+            title='总 收支统计'
+        ).dump_options()
+        line = draw.draw_balance_line(
+            xaxis=result['line_x'],
+            yaxis=result['line_y'],
+            title='总 结余统计'
+        ).dump_options()
+        return render(request, 'index/statistics.html', locals())
 
-    def post(self):
-        return redirect('index/update.html')
+
+class SearchView(View):
+    """
+    详情
+    """
+    def get(self, request):
+        year = request.session.get('year', '')
+        result = tool.search()
+        return render(request, 'index/search.html')
+
+    def post(self, request):
+        year = request.POST.get('year', '')
+        request.session['year'] = year
+        return redirect(reverse('index:search'))
