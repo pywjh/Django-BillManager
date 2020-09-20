@@ -128,5 +128,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # 用于存放静态文件
 ]
 
+# 饼状图最大类别数限制
 NUMBER_WEB_CATEGORY_PIE_EAT = 10
+# 饼状图最大类别数限制
 NUMBER_WEB_CATEGORY_PIE_OTHER = 10
+# 详情搜索，最大条数限制
+NUMBER_MAX_STATISTICS = 1000

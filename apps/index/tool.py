@@ -10,6 +10,7 @@ import logging
 from django.db.models import Count, Sum, Avg, Q
 from django.utils.timezone import localdate
 from django.utils.dateformat import DateFormat
+from django.conf import settings
 
 from index.models import BillModel, DayDetailModel, SalaryDayModel
 
@@ -384,6 +385,9 @@ def search(year_search, select, word):
 
     table = result.values_list('date', 'name', 'amount', 'type', 'note')
     result = result.values('date').annotate(s=Sum('amount')).order_by('date').values_list('date', 's')
+
+    if len(result) > settings.NUMBER_MAX_STATISTICS:
+        result = result[:settings.NUMBER_MAX_STATISTICS]
 
     bar_x = list(
         map(
