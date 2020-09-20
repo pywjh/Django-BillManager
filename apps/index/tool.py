@@ -413,7 +413,7 @@ def search(year_search, select, word):
     table_columns.append(
         {
             "field": "type",  # which is the field's name of data key
-            "title": "日期",  # display as the table header's name
+            "title": "类别",  # display as the table header's name
             "sortable": 'false',
         }
     )
