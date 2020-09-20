@@ -153,11 +153,25 @@ class SearchView(View):
     详情
     """
     def get(self, request):
-        year = request.session.get('year', '')
-        result = tool.search()
-        return render(request, 'index/search.html')
+        year_search = request.session.get('year_search', '')
+        select = request.session.get('select', '')
+        word = request.session.get('word', '')
+        result = tool.search(year_search, select, word)
+        bar = draw.draw_balance_bar(
+            xaxis=result['bar_x'],
+            yaxis=result['bar_y'],
+            title='',
+        ).dump_options()
+        total = result['total']
+        data = result['table_data']
+        columns = result['columns']
+        return render(request, 'index/search.html', locals())
 
     def post(self, request):
-        year = request.POST.get('year', '')
-        request.session['year'] = year
+        year_search = request.POST.get('year_search', '')
+        select = request.POST.get('select')
+        word = request.POST.get('word')
+        request.session['year_search'] = year_search
+        request.session['select'] = select
+        request.session['word'] = word
         return redirect(reverse('index:search'))

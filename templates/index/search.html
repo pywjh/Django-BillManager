@@ -8,11 +8,11 @@
             <thead>
                 <tr style="font-size: 20px">
                     <th class="datepicker-inline">
-                        <input type="radio" id="year" name="type" value="year" checked onclick="show()">
+                        <input type="radio" id="year" name="select" value="year" checked onclick="show()">
                         <label for="year">年份</label>
                     </th>
                     <th class="datepicker-inline">
-                        <input type="radio" id="all" name="type" value="all" onclick="show()">
+                        <input type="radio" id="all" name="select" value="all" onclick="show()">
                         <label for="all">全年</label>
                     </th>
                 </tr>
@@ -20,11 +20,11 @@
             <tbody>
                 <tr>
                     <td>
-                        <input type="text" placeholder="名称/类别" name="word" class="form-control">
+                        <input type="text" placeholder="名称/类别" name="word" class="form-control" value="{{word}}">
                     </td>
                     <td class="td-picker">
                         <input type="text" placeholder="年份" class="form-control picker"
-                               name='{{select_year}}' value="{{today_year}}">
+                               name='year_search' value="{{year_search}}">
                     </td>
                 </tr>
                 <tr>
@@ -61,14 +61,7 @@
                 $(
                     function () {
                         var chart = echarts.init(document.getElementById('chart'), 'white', {renderer: 'canvas'});
-                        $.ajax({
-                            type: "GET",
-                            url: "{{ search_line }}",
-                            dataType: 'json',
-                            success: function (result) {
-                                chart.setOption(result);
-                            }
-                        });
+                        chart.setOption({{bar|safe}});
                     }
                 )
             </script>
@@ -91,7 +84,7 @@
 
 <script type='text/javascript'>
     function show(){
-        let time_type = $('input[name=type]:checked').val()
+        let time_type = $('input[name=select]:checked').val()
         if (time_type === 'all'){
             $('.td-picker').css('display', 'none');
         }

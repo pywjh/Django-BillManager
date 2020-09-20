@@ -7,11 +7,34 @@
 import datetime
 import logging
 
-from django.db.models import Count, Sum, Avg
+from django.db.models import Count, Sum, Avg, Q
 from django.utils.timezone import localdate
 from django.utils.dateformat import DateFormat
 
 from index.models import BillModel, DayDetailModel, SalaryDayModel
+
+columns = [
+        {
+            "field": "date",  # which is the field's name of data key
+            "title": "日期",  # display as the table header's name
+            "sortable": 'false',
+        },
+        {
+            "field": "name",
+            "title": "用途",
+            "sortable": 'false',
+        },
+        {
+            "field": "amount",
+            "title": "金额（元）",
+            "sortable": 'false',
+        },
+        {
+            "field": "note",
+            "title": "备注",
+            "sortable": 'false',
+        },
+    ]
 
 
 def get_objective_day(date) -> int:
@@ -168,28 +191,6 @@ def to_detail_table(date) -> tuple:
     """
     bill_id = get_sure_month_bill(date)
     bills = []
-    columns = [
-        {
-            "field": "date",  # which is the field's name of data key
-            "title": "日期",  # display as the table header's name
-            "sortable": 'false',
-        },
-        {
-            "field": "name",
-            "title": "用途",
-            "sortable": 'false',
-        },
-        {
-            "field": "amount",
-            "title": "金额（元）",
-            "sortable": 'false',
-        },
-        {
-            "field": "note",
-            "title": "备注",
-            "sortable": 'false',
-        },
-    ]
     detail_data = bill_id.day_detail.all().order_by('date')
     for data in detail_data:
         bills.append({
@@ -368,10 +369,55 @@ def statistics():
     }
 
 
-def search(year=None):
+def search(year_search, select, word):
     """
     搜索功能 
     """
-    if not year:
-        year = localdate().year
+    word = word.strip()
+    result = DayDetailModel.objects.filter(
+        Q(name__contains=word) | Q(note__contains=word)
+    ).order_by('date')
 
+    if select == 'year':
+        year = year_search or localdate().year
+        result = result.filter(date__year=year)
+
+    table = result.values_list('date', 'name', 'amount', 'type', 'note')
+    result = result.values('date').annotate(s=Sum('amount')).order_by('date').values_list('date', 's')
+
+    bar_x = list(
+        map(
+            lambda t: f"""{t[0]}({DateFormat(t[0]).D()})""",
+            result
+        )
+    )
+    bar_y = [(word, list(map(lambda t: t[1], result)))]
+
+    total = round(sum(bar_y[0][1]), 2)
+
+    table_data = [
+        {
+            'date': DateFormat(data[0]).c(),
+            'name': data[1] or '',
+            'amount': data[2] or 0,
+            'type': data[3],
+            'note': data[4] or '',
+        }
+        for data in table
+    ]
+    table_columns = columns[::]
+    table_columns.append(
+        {
+            "field": "type",  # which is the field's name of data key
+            "title": "日期",  # display as the table header's name
+            "sortable": 'false',
+        }
+    )
+
+    return {
+        'bar_x': bar_x,
+        'bar_y': bar_y,
+        'total': total,
+        'columns': table_columns,
+        'table_data': table_data,
+    }
