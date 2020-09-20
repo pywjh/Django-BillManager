@@ -7,7 +7,7 @@ from django.utils.timezone import localdate
 
 from django.conf import settings
 from tools import draw
-import tool
+from . import tool
 
 
 # Create your views here.
@@ -116,6 +116,7 @@ class AnnualPaymentsView(View):
             annual_bar = draw.draw_balance_bar(
                 xaxis=result.get('bar_x', []),
                 yaxis=result.get('bar_y', []),
+                difference=result.get('difference'),
                 title=f'{year}年年度收支',
                 markline=result.get('markline', 0)
             ).dump_options()  # 年度条形图
@@ -141,12 +142,8 @@ class StatisticsView(View):
         bar = draw.draw_balance_bar(
             xaxis=result['bar_x'],
             yaxis=result['bar_y'],
+            difference=result['line_y'],
             title='总 收支统计'
-        ).dump_options()
-        line = draw.draw_balance_line(
-            xaxis=result['line_x'],
-            yaxis=result['line_y'],
-            title='总 结余统计'
         ).dump_options()
         return render(request, 'index/statistics.html', locals())
 

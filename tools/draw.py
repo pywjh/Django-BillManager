@@ -2,10 +2,11 @@ from pyecharts import options as opts
 from pyecharts.charts import Bar, Line, Pie
 
 
-def draw_balance_bar(xaxis, yaxis, title="消费统计", markline=None, width=2000) -> Bar:
+def draw_balance_bar(xaxis, yaxis, difference=None, title="消费统计", markline=None, width=2000) -> Bar:
     """
     x = [月_日, 月_日, 月_日, ....]
     y = [(title1, [num1, num2, num3, num4, ...]), (title2, [num1, num2, num3, num4, ...])]
+    :param difference: 差值
     :param xaxis: x轴
     :param yaxis: y轴
     :param title: 标题
@@ -22,6 +23,17 @@ def draw_balance_bar(xaxis, yaxis, title="消费统计", markline=None, width=20
                                        opts.DataZoomOpts(type_="inside")],
                         tooltip_opts=opts.TooltipOpts(trigger='axis', axis_pointer_type='shadow'))
     bar.set_series_opts(label_opts=opts.LabelOpts(is_show=False))
+
+    if difference:
+        name, diff_yaxis = difference
+        line = Line().add_xaxis(xaxis).add_yaxis(
+            name,
+            diff_yaxis,
+            symbol_size=15,
+            z_level=1,
+            is_symbol_show=False,
+        )
+        bar.overlap(line)
 
     if markline is not None:
         bar.set_series_opts(markline_opts=opts.MarkLineOpts(
@@ -48,7 +60,7 @@ def draw_balance_line(xaxis, yaxis, title="消费统计", markline=None, width=2
     line = Line()
     line.add_xaxis(xaxis)
     for name, axis in yaxis:
-        line.add_yaxis(name, axis)
+        line.add_yaxis(name, axis, is_symbol_show=True)
     line.set_global_opts(title_opts=opts.TitleOpts(title=title, ),
                         datazoom_opts=[opts.DataZoomOpts(range_start=0, range_end=100),
                                        opts.DataZoomOpts(type_="inside")],

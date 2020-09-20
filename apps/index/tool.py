@@ -259,6 +259,14 @@ def annual(year) -> dict:
     # 辅助线
     mark_line = round(bills.aggregate(budget_avg=Avg('budget'))['budget_avg'], 2)
 
+    # 月收支差值
+    difference = [
+        '结余',
+        [
+            round((income - expend), 2)
+            for income, expend in zip(bar_income_y[0][1], bar_expend_y[0][1])
+        ]
+    ]
     # 饼状图
     eat_list = list(
                 DayDetailModel.objects.filter(
@@ -303,6 +311,7 @@ def annual(year) -> dict:
         'bar_x': bar_x,  # 条形图x轴
         'bar_y': bar_expend_y+bar_income_y,  # 条形图y轴
         'markline': mark_line,  # 年度统计图辅助线
+        'difference': difference,  # 月剩余
         'eat_list': list(map(lambda t: (t[0], round(t[1], 2)), eat_list)),  # 年度饼状图eat，内圈
         'other_list': list(map(lambda t: (t[0], round(t[1], 2)), other_list)),  # 年度饼状图other，外圈
     }
@@ -350,14 +359,11 @@ def statistics():
         ]
     )
     # 折线图
-    line_y = [
-        ('结余', [round(income - expend, 2) for income, expend in zip(bar_income_y[1], bar_expend_y[1])]),
-    ]
+    line_y = ('结余', [round(income - expend, 2) for income, expend in zip(bar_income_y[1], bar_expend_y[1])])
     return {
         'total_assets': total_assets,
-        'bar_x': bar_x,
+        'bar_x': list(map(str, bar_x)),  # 卡了我好久，不是字符串line试图显示不出数据来,
         'bar_y': list([bar_expend_y, bar_income_y]),
-        'line_x': list(map(str, bar_x)),  # 卡了我好久，不是字符串显示不出数据来
         'line_y': line_y,
     }
 
