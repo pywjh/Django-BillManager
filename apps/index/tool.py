@@ -4,7 +4,6 @@
 # Date：2020/9/9
 # FILE: tools
 # ========================================
-import datetime
 import logging
 
 from django.db.models import Count, Sum, Avg, Q
@@ -105,10 +104,11 @@ def get_current_x(date=None) -> list:
     获取统计图的x轴
     """
     bill_id = get_sure_month_bill(date)
-    x_date = sorted(
-        list(set([date.date for date in bill_id.day_detail.only('date')])),
-        key=lambda m: datetime.datetime(m.year, m.month, m.day),
-    )
+    x_date = bill_id.day_detail.order_by('date').values_list('date', flat=True)
+    # x_date = sorted(
+    #     list(set([date.date for date in bill_id.day_detail.only('date')])),
+    #     key=lambda m: datetime.datetime(m.year, m.month, m.day),
+    # )
     return x_date
 
 
