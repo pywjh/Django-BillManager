@@ -93,7 +93,7 @@ def get_paid_limit() -> float:
     """
     bill_id = get_sure_month_bill()
     # 本月消费
-    total_cost = sum(map(lambda d: d.get('amount', 0), bill_id.day_detail.all().values('amount')))
+    total_cost = round(bill_id.day_detail.aggregate(sum=Sum('amount')).get('sum', 0), 2)
     # 本月剩余天数
     remaining_days = get_remaining_days()
     return round((bill_id.budget - total_cost) / remaining_days, 2)
@@ -104,7 +104,7 @@ def get_current_x(date=None) -> list:
     获取统计图的x轴
     """
     bill_id = get_sure_month_bill(date)
-    x_date = bill_id.day_detail.order_by('date').values_list('date', flat=True)
+    x_date = bill_id.day_detail.distinct().order_by('date').values_list('date', flat=True)
     return x_date
 
 
@@ -207,8 +207,8 @@ def get_category_amount(date) -> tuple:
     bill_id = get_sure_month_bill(date)
     eat_list = []
     other_list = []
-    eat_name = set([i['name'] for i in bill_id.day_detail.filter(type='eat').values('name')])
-    other_name = set([i['name'] for i in bill_id.day_detail.filter(type='other').values('name')])
+    eat_name = bill_id.day_detail.filter(type='eat').distinct().order_by().values_list('name', flat=True)
+    other_name = bill_id.day_detail.filter(type='other').distinct().order_by().values_list('name', flat=True)
     for name in eat_name:
         eat_list.append(
             (
