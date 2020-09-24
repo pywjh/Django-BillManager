@@ -4,7 +4,6 @@
 # Date：2020/9/9
 # FILE: tools
 # ========================================
-import datetime
 import logging
 
 from django.db.models import Count, Sum, Avg, Q
@@ -212,18 +211,16 @@ def get_category_amount(date) -> tuple:
     other_name = set([i['name'] for i in bill_id.day_detail.filter(type='other').values('name')])
     for name in eat_name:
         eat_list.append(
-            (name,
-                sum(map(
-                        lambda d: d.get('amount', 0),
-                        bill_id.day_detail.filter(name=name, type='eat').values('amount'))
-                )))
+            (
+                name,
+                round(bill_id.day_detail.filter(name=name, type='eat').aggregate(sum=Sum('amount')).get('sum', 0), 2))
+        )
     for name in other_name:
         other_list.append(
-            (name,
-                sum(map(
-                        lambda d: d.get('amount', 0),
-                        bill_id.day_detail.filter(name=name, type='other').values('amount'))
-                )))
+            (
+                name,
+                round(bill_id.day_detail.filter(name=name, type='other').aggregate(sum=Sum('amount')).get('sum', 2), 2))
+        )
     eat_list.sort(key=lambda t: t[1], reverse=True)
     other_list.sort(key=lambda t: t[1], reverse=True)
     return eat_list, other_list

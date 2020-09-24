@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 import sys
+import locale
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -127,6 +128,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # 用于存放静态文件
 ]
+
+# locale.setlocale(locale.LC_CTYPE, 'chinese')
 
 # 饼状图最大类别数限制
 NUMBER_WEB_CATEGORY_PIE_EAT = 10

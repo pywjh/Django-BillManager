@@ -35,7 +35,7 @@ class DayDetailModel(models.Model):
         related_name='day_detail',
         verbose_name='总账',
         db_column='bill_id',
-        default=BillModel.objects.first().id
+        default=BillModel.objects.first() and BillModel.objects.first().id
     )
 
     class Meta:
