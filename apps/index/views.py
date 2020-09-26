@@ -22,7 +22,8 @@ class IndexView(View):
         首页由4个东西组成：日付、条形图、表格、饼状图
         """
         # 日付
-        paid_limit = tool.get_paid_limit()
+        paid_limit = tool.get_paid_limit()['true']
+        normal_limit = tool.get_paid_limit()['normal']
         # 条形图
         bar = draw.draw_balance_bar(
             xaxis=[
@@ -65,7 +66,9 @@ class DetailView(View):
         data, columns = tool.to_detail_table(date)
         # 月消费合计
         month_expend = "{:,}".format(tool.get_index_pie(date)[0][1][1])
+        expend = tool.get_index_pie(date)[0][1][1]
         month = tool.get_sure_month_bill(date)
+        budget = month.budget
         return render(request, 'index/detail.html', locals())
 
     def post(self, request):
@@ -93,7 +96,9 @@ class MonthlyPaymentsView(View):
         data, columns = tool.get_table_info(date=date, month=True)
         # 月消费合计
         month_expend = "{:,}".format(tool.get_index_pie(date)[0][1][1])
+        expend = tool.get_index_pie(date)[0][1][1]
         month = tool.get_sure_month_bill(date)
+        budget = month.budget
         return render(request, 'index/month.html', locals())
 
     def post(self, request):
@@ -139,6 +144,7 @@ class StatisticsView(View):
     def get(self, request):
         result = tool.statistics()
         total_assets = "{:,}".format(result['total_assets'])
+        total_assets_chinese = result['total_assets_chinese']
         bar = draw.draw_balance_bar(
             xaxis=result['bar_x'],
             yaxis=result['bar_y'],

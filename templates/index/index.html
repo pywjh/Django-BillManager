@@ -4,7 +4,19 @@
 {% block content %}
 <div style="position: fixed;top: 100px;right: 100px">
     <img src="{% static '/img/paid_limit.png'%}">
-    <span style="position: fixed;top: 200px;right: 84px;text-shadow: 1px 1px black;font-size: 20px">今日可用：￥{{paid_limit}}</span>
+    <span style="position: fixed;top: 200px;right: 84px;text-shadow: 1px 1px black;font-size: 20px;color:
+    {% if normal_limit >= 1 %}
+        #4EEE94
+    {% elif normal_limit >= 0.8 %}
+        #EEC900
+    {% elif normal_limit >= 0.7 %}
+        #FF7F50
+    {% elif normal_limit >= 0.6 %}
+        #FF0000
+    {% else %}
+        #8B0000
+    {% endif %}
+        ">今日可用：￥{{paid_limit}}</span>
 </div>
 
 <div class="container" style="padding: 10px; ">

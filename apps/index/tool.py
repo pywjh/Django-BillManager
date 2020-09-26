@@ -11,7 +11,10 @@ from django.utils.timezone import localdate
 from django.utils.dateformat import DateFormat
 from django.conf import settings
 
-from index.models import BillModel, DayDetailModel, SalaryDayModel
+from .models import BillModel, DayDetailModel, SalaryDayModel
+
+from tools.money2chinese import money2chinese
+from tools.tag import tag
 
 columns = [
         {
@@ -87,7 +90,7 @@ def get_sure_month_bill(date=None) -> BillModel:
         return bill_id
 
 
-def get_paid_limit() -> float:
+def get_paid_limit() -> dict:
     """
     获取日付上线金额
     """
@@ -95,8 +98,13 @@ def get_paid_limit() -> float:
     # 本月消费
     total_cost = round(bill_id.day_detail.aggregate(sum=Sum('amount')).get('sum', 0), 2)
     # 本月剩余天数
-    remaining_days = get_remaining_days()
-    return round((bill_id.budget - total_cost) / remaining_days, 2)
+    remaining_days: int = get_remaining_days()
+    all_day = int(DateFormat(bill_id.date).t())
+    true = round((bill_id.budget - total_cost) / remaining_days, 2)
+    return {
+        'true': true,
+        'normal': round(true / (bill_id.budget / all_day), 2),
+    }
 
 
 def get_current_x(date=None) -> list:
@@ -152,7 +160,7 @@ def get_table_info(date=None, month=None) -> tuple:
         {'name': '本月房租', 'balance': bill_id.rent},
         {'name': '本月预算', 'balance': bill_id.budget},
         {'name': '预算结余', 'balance': round(bill_id.budget - payment, 2)},
-        {'name': '日付上限', 'balance': get_paid_limit()},
+        {'name': '日付上限', 'balance': get_paid_limit()['true']},
         {'name': '月储金额', 'balance': bill_id.save_amount},
         {'name': '本月结余', 'balance': round((bill_id.salary - payment - bill_id.rent), 2)},
     ]
@@ -246,6 +254,10 @@ def annual(year) -> dict:
     total_cost = round((total_eat + total_other), 2)
     total_cost_all = round((total_rent + total_cost), 2)
     annual_earnings = round((total_salary - total_cost_all), 2)
+    eat_proportion = total_eat / total_salary
+    other_proportion = total_other / total_salary
+    rent_proportion = total_rent / total_salary
+    earnings_proportion = annual_earnings / total_salary
 
     # 条形图
     bar_x = [date.strftime('%Y年%m月') for date in bills.values_list('date', flat=True)]
@@ -296,13 +308,52 @@ def annual(year) -> dict:
             },
         ],  # 表格标题
         'status': [
-            {'name': f'{year}年收入金额', 'balance': "{:,}".format(total_salary)},
-            {'name': f'{year}年饮食金额', 'balance': "{:,}".format(total_eat)},
-            {'name': f'{year}年其他金额', 'balance': "{:,}".format(total_other)},
-            {'name': f'{year}年吃穿金额', 'balance': "{:,}".format(total_cost)},
-            {'name': f'{year}年租金金额', 'balance': "{:,}".format(total_rent)},
-            {'name': f'{year}年支出金额', 'balance': "{:,}".format(total_cost_all)},
-            {'name': f'{year}年盈亏金额', 'balance': "{:,}".format(annual_earnings)},
+            {
+                'name': f'{year}年收入金额',
+                'balance': "{:,}".format(total_salary)
+            },
+            {
+                'name': f'{year}年饮食金额',
+                'balance': "{:,} {}".format(total_eat, tag(
+                    'span',
+                    "({:.2%})".format(eat_proportion),
+                    style='color:#8B8989'))
+            },
+            {
+                'name': f'{year}年其他金额',
+                'balance': "{:,} {}".format(total_other, tag(
+                    'span',
+                    "({:.2%})".format(other_proportion),
+                    style='color:#8B8989'))
+            },
+            {
+                'name': f'{year}年吃穿金额',
+                'balance': "{:,} {}".format(total_cost, tag(
+                    'span',
+                    "({:.2%})".format(eat_proportion + other_proportion),
+                    style='color:#698B69'))
+            },
+            {
+                'name': f'{year}年租金金额',
+                'balance': "{:,} {}".format(total_rent, tag(
+                    'span',
+                    "({:.2%})".format(rent_proportion),
+                    style='color:red'))
+            },
+            {
+                'name': f'{year}年支出金额',
+                'balance': "{:,} {}".format(total_cost_all, tag(
+                    'span',
+                    "({:.2%})".format(eat_proportion + other_proportion + rent_proportion),
+                    style='color:#CD5555'))
+            },
+            {
+                'name': f'{year}年盈亏金额',
+                'balance': "{:,} {}".format(annual_earnings, tag(
+                    'span',
+                    "({:.2%})".format(earnings_proportion),
+                    style='color:#CD5555'))
+            },
         ],  # 表格内容
         'bar_x': bar_x,  # 条形图x轴
         'bar_y': bar_expend_y+bar_income_y,  # 条形图y轴
@@ -323,6 +374,7 @@ def statistics():
     total_expend = round(DayDetailModel.objects.values('amount').aggregate(total=Sum('amount')).get('total', 0), 2)
     # 剩余资产
     total_assets = round(total_income - total_expend - total_rent, 2)
+    total_assets_chinese = money2chinese(round(total_income - total_expend - total_rent, 2))
 
     # 条形图x轴
     bar_x = list(BillModel.objects.values('date__year').annotate(c=Count('date__year')).order_by('date__year').values_list('date__year', flat=True))
@@ -358,6 +410,7 @@ def statistics():
     line_y = ('结余', [round(income - expend, 2) for income, expend in zip(bar_income_y[1], bar_expend_y[1])])
     return {
         'total_assets': total_assets,
+        'total_assets_chinese': total_assets_chinese,
         'bar_x': list(map(str, bar_x)),  # 卡了我好久，不是字符串line试图显示不出数据来,
         'bar_y': list([bar_expend_y, bar_income_y]),
         'line_y': line_y,
