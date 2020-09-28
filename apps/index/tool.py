@@ -165,6 +165,7 @@ def get_table_info(date=None, month=None) -> tuple:
         {'name': '本月结余', 'balance': round((bill_id.salary - payment - bill_id.rent), 2)},
     ]
     if month:
+        status.pop(5)
         status.insert(
             1, {'name': '饮食支出', 'balance': round(bill_id.day_detail.filter(type='eat').aggregate(sum=Sum('amount'))['sum'] or 0, 2)}
         )
