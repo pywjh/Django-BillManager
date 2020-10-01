@@ -5,13 +5,7 @@
 
 <div style="position: fixed;top: 100px;right: 100px">
     <img src="{% static '/img/month_expend.png' %}">
-    <span style="position: fixed;top: 180px;right: 40px;text-shadow: 1px 1px black;font-size: 20px;color:
-    {% if expend < budget %}
-        #00CD00
-    {% else %}
-        #CD3333
-    {% endif %}
-    ">月消费合计: ￥{{month_expend}}</span>
+    <span style="position: fixed;top: 180px;right: 40px;text-shadow: 1px 1px black;font-size: 20px">月度收支: ￥{{rest_amount}}</span>
 </div>
 
 <div class="container" style="padding: 10px; ">

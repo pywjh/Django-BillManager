@@ -94,11 +94,9 @@ class MonthlyPaymentsView(View):
         ).dump_options()
         # 表格
         data, columns = tool.get_table_info(date=date, month=True)
-        # 月消费合计
-        month_expend = "{:,}".format(tool.get_index_pie(date)[0][1][1])
-        expend = tool.get_index_pie(date)[0][1][1]
+        # 月结余合计
         month = tool.get_sure_month_bill(date)
-        budget = month.budget
+        rest_amount = "{:,}".format(round(month.salary - month.rent - tool.get_index_pie(date)[0][1][1], 2))
         return render(request, 'index/month.html', locals())
 
     def post(self, request):

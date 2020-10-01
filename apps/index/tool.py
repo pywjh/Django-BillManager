@@ -262,11 +262,14 @@ def annual(year) -> dict:
 
     # 条形图
     bar_x = [date.strftime('%Y年%m月') for date in bills.values_list('date', flat=True)]
-    bar_expend_y = [('支出', [round(bill.day_detail.aggregate(total=Sum('amount'))['total'], 2) for bill in bills])]
+    bar_expend_y = [('支出', [round(bill.day_detail.aggregate(total=Sum('amount'))['total'] + bill.rent, 2) for bill in bills])]
     bar_income_y = [('收入', [bill.salary for bill in bills])]
 
     # 辅助线
-    mark_line = round(bills.aggregate(budget_avg=Avg('budget'))['budget_avg'], 2)
+    mark_line = round(
+        bills.aggregate(budget_avg=Avg('budget'))['budget_avg'] + bills.aggregate(rent_avg=Avg('rent'))['rent_avg'],
+        2
+    )
 
     # 月收支差值
     difference = [
