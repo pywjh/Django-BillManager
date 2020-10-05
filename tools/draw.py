@@ -1,5 +1,5 @@
 from pyecharts import options as opts
-from pyecharts.charts import Bar, Line, Pie
+from pyecharts.charts import Bar, Line, Pie, WordCloud
 
 
 def draw_balance_bar(xaxis, yaxis, difference=None, title="消费统计", markline=None, width=2000) -> Bar:
@@ -135,3 +135,18 @@ def draw_category_pie(inner, outside, inner_title="分类报表", outer_title='�
     pie.set_series_opts(tooltip_opts=opts.TooltipOpts(trigger="item", formatter="{a} <br/>{b}: {c} ({d}%)"))
 
     return pie
+
+
+def draw_wordcloud(data: list, title: str = '云词分析') -> WordCloud:
+    """
+    生成云图
+    data: list(tuple(name1, number1), tuple(name2, number2))
+    """
+    wd: WordCloud = WordCloud()
+    wd.add(series_name=title, data_pair=data, word_size_range=[20, 120]).set_global_opts(
+        title_opts=opts.TitleOpts(
+            title=title, title_textstyle_opts=opts.TextStyleOpts(font_size=40)
+        ),
+        tooltip_opts=opts.TooltipOpts(is_show=True),
+    )
+    return wd

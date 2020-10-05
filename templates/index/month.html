@@ -33,6 +33,14 @@
         });
     </script>
 
+    <div id="chart_wd" style="width:1200px; height:600px;"></div>
+    <script>
+        $(function () {
+            var chart = echarts.init(document.getElementById('chart_wd'));
+            chart.setOption({{wd|safe}});
+        })
+    </script>
+
 
     <div id="chart_usage" style="width:1200px; height:600px;"></div>
     <script>

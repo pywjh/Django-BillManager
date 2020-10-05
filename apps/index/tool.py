@@ -290,7 +290,8 @@ def annual(year) -> dict:
                     bill_id__date__year=year,
                     type='other'
                 ).values('name').annotate(sum=Sum('amount')).order_by('-sum').values_list('name', 'sum'))
-
+    # 云词
+    data = get_wordcloud(year, year=True)
     result = {
         'total_salary': total_salary,  # 年度总工资
         'total_eat': total_eat,  # 年度总饮食消费
@@ -365,6 +366,7 @@ def annual(year) -> dict:
         'difference': difference,  # 月剩余
         'eat_list': list(map(lambda t: (t[0], round(t[1], 2)), eat_list)),  # 年度饼状图eat，内圈
         'other_list': list(map(lambda t: (t[0], round(t[1], 2)), other_list)),  # 年度饼状图other，外圈
+        'wd': data
     }
     return result
 
@@ -476,3 +478,21 @@ def search(year_search, select, word):
         'columns': table_columns,
         'table_data': table_data,
     }
+
+
+def get_wordcloud(time: int, year=False) -> list:
+    data = []
+    if year:
+        names = DayDetailModel.objects.filter(date__year=time).distinct().values_list('name', flat=True).order_by()
+        for name in names:
+            data.append(
+                (name, round(DayDetailModel.objects.filter(name=name).aggregate(s=Sum('amount'))['s'], 2))
+            )
+    else:
+        bill_id = get_sure_month_bill(time)
+        names = bill_id.day_detail.distinct().values_list('name', flat=True).order_by()
+        for name in names:
+            data.append(
+                (name, round(bill_id.day_detail.filter(name=name).aggregate(s=Sum('amount'))['s'], 2))
+            )
+    return data

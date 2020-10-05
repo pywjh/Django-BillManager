@@ -86,6 +86,12 @@ class MonthlyPaymentsView(View):
         month = request.session.get('month', '')
         date = month and datetime.strptime(month, '%Y-%m') or localdate()
         inner, outside = tool.get_category_amount(date)
+        wd = draw.draw_wordcloud(
+            data=tool.get_wordcloud(
+                time=date,
+            ),
+            title='月度热点'
+        ).dump_options()
         line = draw.draw_category_pie(
             inner=inner[:settings.NUMBER_WEB_CATEGORY_PIE_EAT],
             outside=outside[:settings.NUMBER_WEB_CATEGORY_PIE_OTHER],
@@ -114,6 +120,10 @@ class AnnualPaymentsView(View):
         result = tool.annual(year)
         columns = result.get('columns')  # 表格标题
         data = result.get('status', [])  # 表格内容
+        wd = draw.draw_wordcloud(  # 云词
+            data=result['wd'],
+            title='年度热点'
+        ).dump_options()
         if data:
             annual_earnings = "{:,}".format(result.get('annual_earnings', 0))  # 年度收益
             annual_bar = draw.draw_balance_bar(
