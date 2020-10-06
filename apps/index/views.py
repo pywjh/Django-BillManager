@@ -117,6 +117,8 @@ class AnnualPaymentsView(View):
     """
     def get(self, request):
         year = request.session.get('year', '')
+        if not year:
+            year = localdate().year
         result = tool.annual(year)
         columns = result.get('columns')  # 表格标题
         data = result.get('status', [])  # 表格内容
@@ -136,6 +138,8 @@ class AnnualPaymentsView(View):
             annual_pie = draw.draw_category_pie(
                 inner=result.get('eat_list')[:settings.NUMBER_WEB_CATEGORY_PIE_EAT],
                 outside=result.get('other_list')[:settings.NUMBER_WEB_CATEGORY_PIE_OTHER],
+                inner_title=f'{year}年饮食报表',
+                outer_title=f'{year}年其他报表'
             ).dump_options()
         return render(request, 'index/annual.html', locals())
 

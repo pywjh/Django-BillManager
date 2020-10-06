@@ -239,9 +239,6 @@ def annual(year) -> dict:
     """
     年度收支
     """
-    if not year:
-        year = localdate().year
-
     bills = BillModel.objects.filter(date__year=year).order_by('date')
 
     if not bills:
