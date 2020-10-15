@@ -40,7 +40,7 @@
         <a href="{% url 'index:month' %}">月度收支</a>
         <a href="{% url 'index:annual' %}">年度收支</a>
         <a href="{% url 'index:statistics' %}">统计</a>
-        <a href="/search">详情</a>
+        <a href="{% url 'index:search' %}">详情</a>
         <a href="/admin/">后台</a>
         <button onclick="javascript:window.print()" style="margin-left: 60px" class="btn button">打印</button>
     </div>
@@ -50,7 +50,6 @@
     {% block content %} {% endblock %}
     <script src="{% static 'js/common/cat_widget.js' %}"></script>
     <script src="{% static 'js/common/common.js' %}"></script>
-</body>
 </body>
 
 </html>
