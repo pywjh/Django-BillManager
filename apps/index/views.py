@@ -163,6 +163,10 @@ class StatisticsView(View):
             difference=result['line_y'],
             title='总 收支统计'
         ).dump_options()
+        wd = draw.draw_wordcloud(  # 云词
+            data=result['wd'],
+            title='全局热点'
+        ).dump_options()
         return render(request, 'index/statistics.html', locals())
 
 

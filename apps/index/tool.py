@@ -411,12 +411,22 @@ def statistics():
     )
     # 折线图
     line_y = ('结余', [round(income - expend, 2) for income, expend in zip(bar_income_y[1], bar_expend_y[1])])
+
+    # 云词
+    data = []
+    names = DayDetailModel.objects.distinct().values_list('name', flat=True).order_by()
+    for name in names:
+        data.append(
+            (name, round(DayDetailModel.objects.filter(name=name).aggregate(s=Sum('amount'))['s'], 2))
+        )
+
     return {
         'total_assets': total_assets,
         'total_assets_chinese': total_assets_chinese,
         'bar_x': list(map(str, bar_x)),  # 卡了我好久，不是字符串line试图显示不出数据来,
         'bar_y': list([bar_expend_y, bar_income_y]),
         'line_y': line_y,
+        'wd': data,
     }
 
 
