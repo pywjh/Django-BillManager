@@ -42,13 +42,20 @@ columns = [
 
 def get_objective_day(date) -> int:
     """获取准确的发薪日期"""
+    objective = BillModel.objects.filter(
+        date__month=localdate().month,
+        date__year=localdate().year
+    ).first()
+    if objective:
+        return objective.salary_day
     objective = SalaryDayModel.objects.filter(
         start_date__lte=date,
     ).order_by('-start_date').first()
-    if not objective:
-        logging.warning('没有匹配到对应时间账单')
-    else:
+    if objective:
         return objective.day
+    else:
+        logging.warning('没有匹配到对应时间账单')
+
 
 
 def get_remaining_days(date=localdate()) -> int:
@@ -96,7 +103,7 @@ def get_paid_limit() -> dict:
     """
     bill_id = get_sure_month_bill()
     # 本月消费
-    total_cost = round(bill_id.day_detail.aggregate(sum=Sum('amount')).get('sum', 0), 2)
+    total_cost = round(bill_id.day_detail.aggregate(sum=Sum('amount')).get('sum', 0) or 0, 2)
     # 本月剩余天数
     remaining_days: int = get_remaining_days()
     all_day = int(DateFormat(bill_id.date).t())
@@ -246,9 +253,9 @@ def annual(year) -> dict:
 
     # 表格
     total_salary = round(bills.aggregate(total=Sum('salary')).get('total', 0), 2)
-    total_eat = round(sum([bill.day_detail.filter(type='eat').aggregate(total=Sum('amount'))['total'] for bill in bills]), 2)
-    total_other = round(sum([bill.day_detail.filter(type='other').aggregate(total=Sum('amount'))['total'] for bill in bills]), 2)
-    total_rent = round(bills.aggregate(total=Sum('rent')).get('total', 0), 2)
+    total_eat = round(sum([bill.day_detail.filter(type='eat').aggregate(total=Sum('amount')).get('total') or 0 for bill in bills]), 2)
+    total_other = round(sum([bill.day_detail.filter(type='other').aggregate(total=Sum('amount')).get('total') or 0 for bill in bills]), 2)
+    total_rent = round(bills.aggregate(total=Sum('rent')).get('total', 0) or 0, 2)
     total_cost = round((total_eat + total_other), 2)
     total_cost_all = round((total_rent + total_cost), 2)
     annual_earnings = round((total_salary - total_cost_all), 2)
@@ -259,7 +266,7 @@ def annual(year) -> dict:
 
     # 条形图
     bar_x = [date.strftime('%Y年%m月') for date in bills.values_list('date', flat=True)]
-    bar_expend_y = [('支出', [round(bill.day_detail.aggregate(total=Sum('amount'))['total'] + bill.rent, 2) for bill in bills])]
+    bar_expend_y = [('支出', [round((bill.day_detail.aggregate(total=Sum('amount')).get('total') or 0) + bill.rent, 2) for bill in bills])]
     bar_income_y = [('收入', [bill.salary for bill in bills])]
 
     # 辅助线
