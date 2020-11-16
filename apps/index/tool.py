@@ -43,7 +43,7 @@ columns = [
 def get_objective_day(date) -> int:
     """获取准确的发薪日期"""
     objective = BillModel.objects.filter(
-        date__month=localdate().month,
+        date__month__lte=localdate().month,
         date__year=localdate().year
     ).first()
     if objective:
@@ -55,7 +55,6 @@ def get_objective_day(date) -> int:
         return objective.day
     else:
         logging.warning('没有匹配到对应时间账单')
-
 
 
 def get_remaining_days(date=localdate()) -> int:

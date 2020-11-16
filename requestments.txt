@@ -1,0 +1,10 @@
+asgiref==3.2.10
+Django==3.1.1
+django-simpleui==2020.9.26
+Jinja2==2.11.2
+MarkupSafe==1.1.1
+prettytable==0.7.2
+pyecharts==1.7.0
+pytz==2020.1
+simplejson==3.17.2
+sqlparse==0.3.1
