@@ -61,7 +61,21 @@ def get_remaining_days(date=localdate()) -> int:
     """
     返回根据发薪日，来控制的截止时间（到发薪日还有多少天）
     """
-    objective_day = get_objective_day(date)
+    # 此处逻辑有些漏洞：
+    #   约定发薪日临周末提前发（加入3号，本来5号）时，
+    #   一个月的结束是以提前发的（3号）日期截止，
+    #   其实还是应该按照发薪日来作为截止时间
+    # 优化为判断发薪截止日是否为周末，周末就提前
+    # 发薪日
+    objective_day = SalaryDayModel.objects.filter(
+        start_date__lte=date,
+    ).order_by('-start_date').first().day
+    #  周末情况，节假日就无能为力了
+    if DateFormat(date.replace(day=objective_day)).w() == 6:  # 周六
+        objective_day -= 1
+    elif DateFormat(date.replace(day=objective_day)).w() == 0:  # 周日
+        objective_day -= 2
+
     current_month_max_day = int(DateFormat(date).t())
 
     if date.day >= objective_day:
