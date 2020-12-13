@@ -40,6 +40,19 @@ columns = [
     ]
 
 
+def salary_day_with_week_day(date):
+    """优化为判断发薪截止日是否为周末，周末就提前"""
+    objective_day = SalaryDayModel.objects.filter(
+        start_date__lte=date,
+    ).order_by('-start_date').first().day
+    #  周末情况，节假日就无能为力了
+    if DateFormat(date.replace(day=objective_day)).w() == 6:  # 周六
+        objective_day -= 1
+    elif DateFormat(date.replace(day=objective_day)).w() == 0:  # 周日
+        objective_day -= 2
+    return objective_day
+
+
 def get_objective_day(date) -> int:
     """获取准确的发薪日期"""
     objective = BillModel.objects.filter(
@@ -67,14 +80,7 @@ def get_remaining_days(date=localdate()) -> int:
     #   其实还是应该按照发薪日来作为截止时间
     # 优化为判断发薪截止日是否为周末，周末就提前
     # 发薪日
-    objective_day = SalaryDayModel.objects.filter(
-        start_date__lte=date,
-    ).order_by('-start_date').first().day
-    #  周末情况，节假日就无能为力了
-    if DateFormat(date.replace(day=objective_day)).w() == 6:  # 周六
-        objective_day -= 1
-    elif DateFormat(date.replace(day=objective_day)).w() == 0:  # 周日
-        objective_day -= 2
+    objective_day = salary_day_with_week_day(date)
 
     current_month_max_day = int(DateFormat(date).t())
 
@@ -95,13 +101,10 @@ def get_sure_month_bill(date=None) -> BillModel:
         month = DateFormat(date).n()
         day = DateFormat(date).j()
 
-        objective_day = get_objective_day(date)
+        salary_day = salary_day_with_week_day(date)
 
-        if not objective_day:
-            return BillModel.objects.first()
-
-        month = month - 1 or 12 if day < objective_day else month
-        return BillModel.objects.get(date=f"{year}-{month}-{objective_day}")
+        month = month - 1 or 12 if day < salary_day else month
+        return BillModel.objects.get(date__year=year, date__month=month)
 
     else:
         bill_id = BillModel.objects.filter(date__gte=date).order_by('date').first()
