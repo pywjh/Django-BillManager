@@ -104,7 +104,10 @@ def get_sure_month_bill(date=None) -> BillModel:
         salary_day = salary_day_with_week_day(date)
 
         month = month - 1 or 12 if day < salary_day else month
-        return BillModel.objects.get(date__year=year, date__month=month)
+        result = BillModel.objects.filter(date__year=year, date__month=month)
+        if result.exists():
+            return result.first()
+        raise ModuleNotFoundError("次月账单没有维护，请前往admin页签维护后使用")
 
     else:
         bill_id = BillModel.objects.filter(date__gte=date).order_by('date').first()
