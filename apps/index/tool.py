@@ -9,6 +9,7 @@ import logging
 from django.db.models import Count, Sum, Avg, Q
 from django.utils.timezone import localdate
 from django.utils.dateformat import DateFormat
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
 from .models import BillModel, DayDetailModel, SalaryDayModel
@@ -97,14 +98,14 @@ def get_sure_month_bill(date=None) -> BillModel:
     """
     if not date:
         date = localdate()
-        year = DateFormat(date).Y()
-        month = DateFormat(date).n()
         day = DateFormat(date).j()
 
         salary_day = salary_day_with_week_day(date)
 
-        month = month - 1 or 12 if day < salary_day else month
-        result = BillModel.objects.filter(date__year=year, date__month=month)
+        if day < salary_day:
+            date = date - relativedelta(months=1)
+
+        result = BillModel.objects.filter(date__year=date.year, date__month=date.month)
         if result.exists():
             return result.first()
         raise ModuleNotFoundError("次月账单没有维护，请前往admin页签维护后使用")
