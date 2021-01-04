@@ -262,6 +262,15 @@ def get_category_amount(date) -> tuple:
     return eat_list, other_list
 
 
+def get_objective_year() -> int:
+    today = localdate()
+    salary_day = salary_day_with_week_day(today)
+
+    if today.day < salary_day:
+        date = today - relativedelta(months=1)
+    return date.year
+
+
 def annual(year) -> dict:
     """
     年度收支

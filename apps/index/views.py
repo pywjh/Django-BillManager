@@ -121,7 +121,7 @@ class AnnualPaymentsView(View):
     def get(self, request):
         year = request.session.get('year', '')
         if not year:
-            year = localdate().year
+            year = tool.get_objective_year()
         result = tool.annual(year)
         columns = result.get('columns')  # 表格标题
         data = result.get('status', [])  # 表格内容
