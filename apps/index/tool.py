@@ -278,7 +278,12 @@ def annual(year) -> dict:
     bills = BillModel.objects.filter(date__year=year).order_by('date')
 
     if not bills:
-        return {}
+        last_record = BillModel.objects.filter(date__year__lte=year).first()
+        if last_record:
+            year = last_record.date.year
+        else:
+            year = BillModel.objects.first().date.year
+        bills = BillModel.objects.filter(date__year=year).order_by('date')
 
     # 表格
     total_salary = round(bills.aggregate(total=Sum('salary')).get('total', 0), 2)
@@ -399,7 +404,8 @@ def annual(year) -> dict:
         'difference': difference,  # 月剩余
         'eat_list': list(map(lambda t: (t[0], round(t[1], 2)), eat_list)),  # 年度饼状图eat，内圈
         'other_list': list(map(lambda t: (t[0], round(t[1], 2)), other_list)),  # 年度饼状图other，外圈
-        'wd': data
+        'wd': data,
+        'year': year
     }
     return result
 

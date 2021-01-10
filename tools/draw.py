@@ -6,7 +6,7 @@ def draw_balance_bar(xaxis, yaxis, difference=None, title="消费统计", markli
     """
     x = [月_日, 月_日, 月_日, ....]
     y = [(title1, [num1, num2, num3, num4, ...]), (title2, [num1, num2, num3, num4, ...])]
-    :param difference: 差值
+    :param difference: 差值 (比如：收入100，消费80，差值就是20) : ['title', [1,2,3,4]]
     :param xaxis: x轴
     :param yaxis: y轴
     :param title: 标题
@@ -89,11 +89,11 @@ def draw_usage_pie(payout, budget, title) -> Pie:
     pie = Pie()
     pie.add(series_name=title,
           data_pair=budget,
-          radius=["0%", "30%"],
+          radius=["0%", "40%"],
           label_opts=opts.LabelOpts(position="inner"),
           )
     pie.add(series_name=title,
-          radius=["30%", "40%"],
+          radius=["40%", "50%"],
           data_pair=payout,
           label_opts=opts.LabelOpts(position="outside",
                                     formatter="{b}:\n{c}({d}%)",

@@ -123,27 +123,29 @@ class AnnualPaymentsView(View):
         if not year:
             year = tool.get_objective_year()
         result = tool.annual(year)
-        columns = result.get('columns')  # 表格标题
-        data = result.get('status', [])  # 表格内容
-        wd = draw.draw_wordcloud(  # 云词
-            data=result['wd'],
-            title='年度热点'
-        ).dump_options()
-        if data:
-            annual_earnings = "{:,}".format(result.get('annual_earnings', 0))  # 年度收益
-            annual_bar = draw.draw_balance_bar(
-                xaxis=result.get('bar_x', []),
-                yaxis=result.get('bar_y', []),
-                difference=result.get('difference'),
-                title=f'{year}年年度收支',
-                markline=result.get('markline', 0)
-            ).dump_options()  # 年度条形图
-            annual_pie = draw.draw_category_pie(
-                inner=result.get('eat_list')[:settings.NUMBER_WEB_CATEGORY_PIE_EAT],
-                outside=result.get('other_list')[:settings.NUMBER_WEB_CATEGORY_PIE_OTHER],
-                inner_title=f'{year}年饮食报表',
-                outer_title=f'{year}年其他报表'
+        if result:
+            columns = result.get('columns')  # 表格标题
+            data = result.get('status', [])  # 表格内容
+            wd = draw.draw_wordcloud(  # 云词
+                data=result['wd'],
+                title='年度热点'
             ).dump_options()
+            if data:
+                annual_earnings = "{:,}".format(result.get('annual_earnings', 0))  # 年度收益
+                annual_bar = draw.draw_balance_bar(
+                    xaxis=result.get('bar_x', []),
+                    yaxis=result.get('bar_y', []),
+                    difference=result.get('difference'),
+                    title=f'{year}年年度收支',
+                    markline=result.get('markline', 0)
+                ).dump_options()  # 年度条形图
+                annual_pie = draw.draw_category_pie(
+                    inner=result.get('eat_list')[:settings.NUMBER_WEB_CATEGORY_PIE_EAT],
+                    outside=result.get('other_list')[:settings.NUMBER_WEB_CATEGORY_PIE_OTHER],
+                    inner_title=f'{year}年饮食报表',
+                    outer_title=f'{year}年其他报表'
+                ).dump_options()
+            year = result.get('year')
         return render(request, 'index/annual.html', locals())
 
     def post(self, request):

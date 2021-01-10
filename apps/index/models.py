@@ -61,4 +61,4 @@ class SalaryDayModel(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return f"{self.start_date}-{self.company}"
+        return f"{formats.date_format(self.start_date)}-{self.company}"

@@ -2,15 +2,15 @@
 
 
 {% block content %}
-<div style="position: fixed;top: 100px;right: 100px">
+<div style="position: fixed;top: 100px;right: 8%">
     <img src="{% static '/img/annual_earnings.png' %}">
-    <span style="position: fixed;top: 230px;right: 80px;text-shadow: 1px 1px black;font-size: 20px">年度收益: ￥{{annual_earnings}}</span>
+    <span style="position: fixed;top: 230px;right: 5%;text-shadow: 1px 1px black;font-size: 20px">年度收益: ￥{{annual_earnings}}</span>
 </div>
 
-<div class="container" style="padding: 10px; ">
+<div>
     <form action="{% url 'index:annual' %}" method="post">
         {% csrf_token %}
-        <div class="input-group" style="width: 200px;padding: 10px;">
+        <div class="input-group" style="width: 20%;padding: 10px;">
             <input type="text" placeholder="账单年" class="form-control bar_picker" name='year' value="{{year}}">
             <input type="submit" value="确认">
         </div>
@@ -31,8 +31,8 @@
 
 </script>
 
-<div class="container" style="padding: 10px; ">
-    <div id="chart" style="width:1200px; height:600px;"></div>
+<div>
+    <div id="chart" style="width:100%; height:600px;"></div>
     <script>
         $(
             function () {
@@ -44,7 +44,7 @@
 
     <hr>
 
-    <div id="chart_wd" style="width:1200px; height:600px;"></div>
+    <div id="chart_wd" style="width:100%; height:600px;"></div>
     <script>
         $(function () {
             var chart = echarts.init(document.getElementById('chart_wd'));
@@ -52,7 +52,7 @@
         })
     </script>
 
-    <div id="pie_chart" style="width:1200px; height:600px;"></div>
+    <div id="pie_chart" style="width:100%; height:600px;"></div>
     <script>
         $(
             function () {

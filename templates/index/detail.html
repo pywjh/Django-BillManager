@@ -3,9 +3,9 @@
 
 {% block content %}
 
-<div style="position: fixed;top: 100px;right: 100px">
+<div style="position: fixed;top: 100px;right: 8%">
     <img src="{% static '/img/month_expend.png' %}">
-    <span style="position: fixed;top: 180px;right: 40px;text-shadow: 1px 1px black;font-size: 20px;color:
+    <span style="position: fixed;top: 180px;right: 2%;text-shadow: 1px 1px black;font-size: 20px;color:
     {% if expend < budget %}
         #00CD00
     {% else %}
@@ -14,11 +14,10 @@
     ">月消费合计: ￥{{month_expend}}</span>
 </div>
 
-<div class="container" style="padding: 10px; ">
-
+<div>
     <form action="{% url 'index:detail' %}" method="post">
         {% csrf_token %}
-        <div class="input-group" style="width: 200px;padding: 10px;">
+        <div class="input-group" style="width: 20%;padding: 10px;">
             <input type="text" placeholder="账单月" class="form-control picker"
                    name='month' value="{{month}}">
             <input type="submit" value="确认">
@@ -42,7 +41,7 @@
 
 
 <div class="container" style="padding: 10px; ">
-    <div id="chart" style="width:1200px; height:600px;"></div>
+    <div id="chart" style="width:100%; height:600px;"></div>
 </div>
 <script>
     $(

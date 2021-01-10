@@ -2,14 +2,14 @@
 
 
 {% block content %}
-<div style="position: fixed;top: 100px;right: 100px">
+<div style="position: fixed;top: 100px;right: 8%">
     <img src="{% static '/img/paid_limit.png'%}">
     <!--#4EEE94 绿色-->
     <!--#EEC900  黄色-->
     <!--#FF7F50  橙色-->
     <!--#FF0000 /鲜红/-->
     <!--#8B0000 /深色/-->
-    <span style="position: fixed;top: 200px;right: 84px;text-shadow: 1px 1px black;font-size: 20px;color:
+    <span style="position: fixed;top: 200px;right: 5%;text-shadow: 1px 1px black;font-size: 20px;color:
     {% if normal_limit >= 1 %}
         #4EEE94
     {% elif normal_limit >= 0.8 %}
@@ -24,8 +24,8 @@
         ">今日可用：￥{{paid_limit}}</span>
 </div>
 
-<div class="container" style="padding: 10px; ">
-    <div id="chart" style="width:1200px; height:600px;"></div>
+<div style="width: 100%">
+    <div id="chart" style="width:100%; height:600px;"></div>
     <script>
         $(function () {
                 var chart = echarts.init(document.getElementById('chart'), 'white', {renderer: 'canvas'});
@@ -36,7 +36,7 @@
 
     {% include 'index/status_table.html' %}
 
-    <div id="chart_usage" style="width:1200px; height:600px;"></div>
+    <div id="chart_usage" style="width:100%; height:600px;"></div>
     <script>
         $(function () {
             var chart = echarts.init(document.getElementById('chart_usage'), 'white', {renderer: 'canvas'});

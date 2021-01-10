@@ -7,8 +7,8 @@
 <!--    <span style="position: fixed;top: 230px;right: 80px;text-shadow: 1px 1px black;font-size: 20px">剩余资产：￥{{total_assets}}</span>-->
 <!--</div>-->
 
-<div class="container" style="padding: 10px; ">
-    <div id="chart_bar" style="width:1200px; height:600px;"></div>
+<div>
+    <div id="chart_bar" style="width:100%; height:600px;"></div>
     <script>
         $(
             function () {
@@ -22,7 +22,7 @@
     <hr>
     <br>
 
-    <div id="chart_wd" style="width:1200px; height:600px;"></div>
+    <div id="chart_wd" style="width:100%; height:600px;"></div>
     <script>
         $(function () {
             var chart = echarts.init(document.getElementById('chart_wd'));
