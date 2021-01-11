@@ -131,4 +131,5 @@ dmypy.json
 /.idea/
 /.DS_Store/
 
-/apps/index/migrations/
+migrations/
+/database-backup/
