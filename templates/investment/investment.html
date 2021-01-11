@@ -7,137 +7,165 @@
 
 {% block content %}
 <div id="app" class="container">
-  <date-picker @query="fullMyChart($event)"></date-picker>
-  <!--  折线图  -->
-  <div id="main" style="width: 90%;height:600px;margin: auto"></div>
-  
-  <script type="application/javascript">
-    $(".picker").datepicker({
-      format: "yyyy-mm-dd",
-      todayBtn: "linked",
-      language: "zh-CN",
-      orientation: "auto",//日期控件显示位置
-      startView: "days",//默认显示视图：months、years、centuries，可选
-      minViewMode: "days",//最小显示视图
-      keyboardNavigation: false,
-      autoclose: false,
-      todayHighlight: true
-    });
-  </script>
+   <date-picker @query="fullMyChart($event)"
+                :amount="total_amount"
+                :earnings="total_earnings">
+   </date-picker>
+   <!--  折线图  -->
+   <div id="main" style="width: 90%;height:600px;margin: auto"></div>
+   
+   <script type="application/javascript">
+      $(".picker").datepicker({
+         format: "yyyy-mm-dd",
+         todayBtn: "linked",
+         language: "zh-CN",
+         orientation: "auto",//日期控件显示位置
+         startView: "days",//默认显示视图：months、years、centuries，可选
+         minViewMode: "days",//最小显示视图
+         keyboardNavigation: false,
+         autoclose: false,
+         todayHighlight: true
+      });
+   </script>
 </div>
 
-
-
 <script>
-  axios.defaults.baseURL = document.location.origin;
-  
-  axios.interceptors.response.use(function (res) {
-    return res.data;
-  }, function (err) {
-    console.log(err)
-  })
-  
-  const datePicker = {
-    data: function () {
-      return {
-        start: '',
-        end: '',
-      }
-    },
-    template: `
-       <div>
-        <div>
-          <td style="padding-left: 30px">
-            <button @click="changeDate('YEAR')">本年</button>
-          </td>
-          <td style="padding-left: 20px">
-            <button @click="changeDate('MONTH')">本月</button>
-          </td>
-          <td style="padding-left: 20px">
-            <button @click="changeDate('WEEKEND')">本周</button>
-          </td>
-        </div>
-        <table style="width: 70%;margin: auto; padding: 10px">
-          <tbody>
-          <tr>
-            <td><b>查询区间</b></td>
-            <td class="td-picker">
-              <input type="text" placeholder="开始时间" class="form-control picker" v-model="start" @blur='queryStart($event)'>
-            </td>
-            <td class="td-picker">
-              <input type="text" placeholder="结束时间" class="form-control picker" v-model="end" @blur='queryEnd($event)'>
-            </td>
-          </tr>
-          </tbody>
-        </table>
+   axios.defaults.baseURL = document.location.origin;
+   
+   axios.interceptors.response.use(function (res) {
+      return res.data;
+   }, function (err) {
+      console.log(err)
+   })
+   
+   const datePicker = {
+      props: ['amount', 'earnings'],
+      data: function () {
+         return {
+            start: '',
+            end: '',
+         }
+      },
+      template: `
+     <div>
+     
+      <div style="padding: 5px 10px" class="buttons">
+        <td style="padding-left: 30px">
+          <button class="btn btn-default" @click="changeDate('YEAR')">本年</button>
+        </td>
+        <td style="padding-left: 20px">
+          <button class="btn btn-default" @click="changeDate('MONTH')">本月</button>
+        </td>
+        <td style="padding-left: 20px">
+          <button class="btn btn-default" @click="changeDate('LAST_WEEK')">上周</button>
+        </td>
+        <td style="padding-left: 20px">
+          <button class="btn btn-default" @click="changeDate('WEEKEND')">本周</button>
+        </td>
+        <td style="padding-left: 20px">
+          <button class="btn btn-default" @click="changeDate('ALL')">全部</button>
+        </td>
+        <td style="padding-left: 20px">区间消费： <span v-text="amount"></span></td>
+        
+        <td style="padding-left: 20px" v-if="earnings >= 0">
+        区间收益：
+        <span style="color: red" v-text="earnings"></span>
+        </td>
+        <td style="padding-left: 20px" v-else>
+        区间收益：
+        <span style="color: greenyellow" v-text="earnings"></span>
+        </td>
       </div>
-       
+      
+      <table style="width: 70%;height: 30px;margin: auto; padding: 10px">
+        <tbody>
+        <tr>
+          <td><b>查询区间</b></td>
+          <td class="td-picker">
+            <input type="text" placeholder="开始时间" class="form-control picker start" v-model="start">
+          </td>
+          <td class="td-picker">
+            <input type="text" placeholder="结束时间" class="form-control picker end" v-model="end">
+          </td>
+          <td>
+            <button @click='query' class="btn btn-default">查询</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      
+    </div>
         `,
-    methods: {
-      today: function () {
-        var now = new Date();
-        now.setTime(now.getTime());
-        this.end = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
-        if (now.getMonth() === 0) {
-          this.start = `${now.getFullYear() - 1}-12-${now.getDate()}`;
-        } else {
-          this.start = now.getFullYear() + "-" + (now.getMonth()) + "-" + now.getDate();
-        }
+      methods: {
+         today: function () {
+            var now = new Date();
+            now.setTime(now.getTime());
+            this.end = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+            if (now.getMonth() === 0) {
+               this.start = `${now.getFullYear() - 1}-12-${now.getDate()}`;
+            } else {
+               this.start = now.getFullYear() + "-" + (now.getMonth()) + "-" + now.getDate();
+            }
+         },
+         query: function () {
+            // this.$emit("query", {start: this.start, end: this.end});
+            // v-model 取不到日期，还是改成了jquery
+            this.$emit("query", {start: $('.start').val(), end: $('.end').val()});
+         },
+         changeDate: async function (type) {
+            var result = await axios('changeDate', {
+               params: {
+                  'type': type
+               }
+            });
+            if (result.code === 200) {
+               this.start = result.start;
+               this.end = result.end;
+               this.$emit('query', {start: this.start, end: this.end})
+            } else {
+               console.log(result.message);
+            }
+         }
       },
-      queryStart: function (event) {
-        this.$emit("query", {start: event.target.value, end: this.end});
-      },
-      queryEnd: function (event) {
-        this.$emit("query", {start: this.start, end: event.target.value});
-      },
-      changeDate: async function (type) {
-        var result = await axios('changeDate', {
-          params: {
-            'type': type
-          }
-        });
-        if (result.code === 200) {
-          this.start = result.start;
-          this.end = result.end;
-          this.$emit('query', {start: this.start, end: this.end})
-        } else {
-          console.log(result.message);
-        }
+      mounted: function () {
+         this.today();
+         this.$emit('query', {start: this.start, end: this.end});
       }
-    },
-    mounted: function () {
-      this.today();
-      this.$emit('query', {start: this.start, end: this.end})
-    }
-  }
-  
-  const vm = new Vue({
-    el: "#app",
-    methods: {
-      fullMyChart: async function (date) {
-        // 折线图数据请求与填充
-        // 基于准备好的dom，初始化echarts实例
-        var myChart = echarts.init(document.getElementById('main'));
-        var result = await axios.get('earnings', {
-          params: {
-            start: date.start,
-            end: date.end,
-          }
-        });
-        if (result && result.code === 200) {
-          // 使用刚指定的配置项和数据显示图表。
-          myChart.setOption(JSON.parse(result.option));
-        } else if (result && result.code !== 200) {
-          alert(result.option)
-        } else {
-          console.log("服务器异常")
-        }
+   }
+   
+   const vm = new Vue({
+      el: "#app",
+      data: {
+         total_amount: 0,
+         total_earnings: 0,
+      },
+      methods: {
+         fullMyChart: async function (date) {
+            // 折线图数据请求与填充
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'));
+            var result = await axios.get('earnings', {
+               params: {
+                  start: date.start,
+                  end: date.end,
+               }
+            });
+            if (result && result.code === 200) {
+               // 使用刚指定的配置项和数据显示图表。
+               myChart.setOption(JSON.parse(result.option));
+               this.total_amount = result.total_amount;
+               this.total_earnings = result.total_earnings;
+            } else if (result && result.code !== 200) {
+               alert(result.option)
+            } else {
+               console.log("服务器异常")
+            }
+         }
+      },
+      components: {
+         'date-picker': datePicker,
       }
-    },
-    components: {
-      'date-picker': datePicker,
-    }
-  })
+   })
 </script>
 
 {% endblock %}
