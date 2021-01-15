@@ -13,6 +13,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
 from .models import BillModel, DayDetailModel, SalaryDayModel
+from investment.models import InvestmentModel
 
 from tools.money2chinese import money2chinese
 from tools.tag import tag
@@ -88,6 +89,14 @@ def get_remaining_days(date=localdate()) -> int:
     if date.day >= objective_day:
         return current_month_max_day - date.day + objective_day
     return objective_day - date.day
+
+
+def get_sure_month_investment(date):
+    """
+    通过对应时间，获取对应当月的投资理财表的数据，汇总金额合计
+    """
+    month_investment_amount = InvestmentModel.objects.filter(date__year=date.year, date__month=date.month)
+    return month_investment_amount.aggregate(sum=Sum('earnings')).get('sum') or 0
 
 
 def get_sure_month_bill(date=None) -> BillModel:
@@ -188,7 +197,6 @@ def get_table_info(date=None, month=None) -> tuple:
         {'name': '本月预算', 'balance': bill_id.budget},
         {'name': '预算结余', 'balance': round(bill_id.budget - payment, 2)},
         {'name': '日付上限', 'balance': get_paid_limit()['true']},
-        {'name': '月储金额', 'balance': bill_id.save_amount},
         {'name': '本月结余', 'balance': round((bill_id.salary - payment - bill_id.rent), 2)},
     ]
     if month:
@@ -199,6 +207,7 @@ def get_table_info(date=None, month=None) -> tuple:
         status.insert(
             2, {'name': '其他支出', 'balance': round(bill_id.day_detail.filter(type='other').aggregate(sum=Sum('amount'))['sum'] or 0, 2)}
         )
+        status.append({'name': '理财盈亏', 'balance': round(get_sure_month_investment(date), 2)},)
     return status, columns
 
 
@@ -278,12 +287,14 @@ def annual(year) -> dict:
     bills = BillModel.objects.filter(date__year=year).order_by('date')
 
     if not bills:
+        # 如果指定的年份不存在数据，就取最靠近的
         last_record = BillModel.objects.filter(date__year__lte=year).first()
-        if last_record:
-            year = last_record.date.year
-        else:
-            year = BillModel.objects.first().date.year
+        year = last_record and last_record.date.year or BillModel.objects.first().date.year
         bills = BillModel.objects.filter(date__year=year).order_by('date')
+
+    # 投资理财 年度 汇总
+    investment = InvestmentModel.objects.filter(date__year=year)
+    investment_amount = investment.exists() and round(investment.aggregate(total=Sum('earnings')).get('total', 0), 2) or 0
 
     # 表格
     total_salary = round(bills.aggregate(total=Sum('salary')).get('total', 0), 2)
@@ -396,6 +407,10 @@ def annual(year) -> dict:
                     'span',
                     "({:.2%})".format(earnings_proportion),
                     style='color:#CD5555'))
+            },
+            {
+                'name': f'{year}年投资盈亏',
+                'balance': "{:,}".format(investment_amount)
             },
         ],  # 表格内容
         'bar_x': bar_x,  # 条形图x轴

@@ -7,11 +7,11 @@ from django.utils import timezone, formats
 class BillModel(models.Model):
     date = models.DateField('日期', default=timezone.now, unique=True)
     salary = models.FloatField('工资')
-    save_amount = models.FloatField('存储金')
+    save_amount = models.FloatField('存储金', null=True, blank=True)
     budget = models.FloatField('预算')
     rent = models.FloatField('房租')
     salary_day = models.IntegerField('发薪日')
-    note = models.CharField('备注', blank=True, null=True, max_length=256)
+    note = models.TextField('备注', blank=True, null=True, max_length=256)
 
     class Meta:
         ordering = ['-date', '-id']
@@ -45,7 +45,7 @@ class DayDetailModel(models.Model):
         verbose_name_plural = verbose_name
         
     def __str__(self):
-        return self.date.strftime('%Y-%m-%d')
+        return formats.date_format(self.date)
 
 
 class SalaryDayModel(models.Model):
