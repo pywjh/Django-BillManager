@@ -551,7 +551,7 @@ def get_wordcloud(time: int, year=False) -> list:
         names = DayDetailModel.objects.filter(date__year=time).distinct().values_list('name', flat=True).order_by()
         for name in names:
             data.append(
-                (name, round(DayDetailModel.objects.filter(name=name).aggregate(s=Sum('amount'))['s'], 2))
+                (name, round(DayDetailModel.objects.filter(name=name, date__year=time).aggregate(s=Sum('amount'))['s'], 2))
             )
     else:
         bill_id = get_sure_month_bill(time)
