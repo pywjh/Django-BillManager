@@ -3,6 +3,11 @@
 {% block static %}
 <script src="{% static 'js/vue-lib/vue_2.5.22.js' %}"></script>
 <script src="{% static 'js/vue-lib/axios.js' %}"></script>
+<style>
+   div.buttons > td {
+      padding-left: 20px;
+   }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -51,29 +56,35 @@
      
       <div style="padding: 5px 10px" class="buttons">
         <td style="padding-left: 30px">
+          <button class="btn btn-default" @click="changeDate('LAST_YEAR')">上一年</button>
+        </td>
+        <td>
           <button class="btn btn-default" @click="changeDate('YEAR')">本年</button>
         </td>
-        <td style="padding-left: 20px">
+        <td>
+          <button class="btn btn-default" @click="changeDate('LAST_MONTH')">上一月</button>
+        </td>
+        <td>
           <button class="btn btn-default" @click="changeDate('MONTH')">本月</button>
         </td>
-        <td style="padding-left: 20px">
-          <button class="btn btn-default" @click="changeDate('LAST_WEEK')">上周</button>
+        <td>
+          <button class="btn btn-default" @click="changeDate('LAST_WEEK')">上一周</button>
         </td>
-        <td style="padding-left: 20px">
-          <button class="btn btn-default" @click="changeDate('WEEKEND')">本周</button>
+        <td>
+          <button class="btn btn-default" @click="changeDate('WEEK')">当前周</button>
         </td>
-        <td style="padding-left: 20px">
+        <td>
           <button class="btn btn-default" @click="changeDate('ALL')">全部</button>
         </td>
-        <td style="padding-left: 20px">区间消费： <span v-text="amount"></span></td>
+        <td>区间消费： <span v-text="amount"></span></td>
         
-        <td style="padding-left: 20px" v-if="earnings >= 0">
+        <td v-if="earnings >= 0">
         区间收益：
         <span style="color: red" v-text="earnings"></span>
         </td>
         <td style="padding-left: 20px" v-else>
         区间收益：
-        <span style="color: greenyellow" v-text="earnings"></span>
+        <span style='color:green' v-text="earnings"></span>
         </td>
       </div>
       
@@ -115,7 +126,9 @@
          changeDate: async function (type) {
             var result = await axios('changeDate', {
                params: {
-                  'type': type
+                  'type': type,
+                  'start': this.start,
+                  'end': this.end,
                }
             });
             if (result.code === 200) {
@@ -123,7 +136,7 @@
                this.end = result.end;
                this.$emit('query', {start: this.start, end: this.end})
             } else {
-               console.log(result.message);
+               console.log('服务器错误：', result.message);
             }
          }
       },

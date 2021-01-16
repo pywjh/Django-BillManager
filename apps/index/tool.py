@@ -87,8 +87,8 @@ def get_remaining_days(date=localdate()) -> int:
     current_month_max_day = int(DateFormat(date).t())
 
     if date.day >= objective_day:
-        return current_month_max_day - date.day + objective_day
-    return objective_day - date.day
+        return current_month_max_day - date.day + objective_day - 1
+    return objective_day - date.day - 1
 
 
 def get_sure_month_investment(date):
@@ -139,6 +139,7 @@ def get_paid_limit() -> dict:
     true = round((bill_id.budget - total_cost) / remaining_days, 2)
     return {
         'true': true,
+        'remaining_days': remaining_days,
         'normal': round(true / (bill_id.budget / all_day), 2),
     }
 
