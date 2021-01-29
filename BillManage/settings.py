@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'index.apps.IndexConfig',
     'investment.apps.InvestmentConfig',
+    'regular_input.apps.RegularInputConfig',
 ]
 
 MIDDLEWARE = [
