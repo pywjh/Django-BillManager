@@ -14,7 +14,7 @@ from index.models import DayDetailModel
 from django.utils import formats, timezone
 from django.db.models import Sum
 
-from tools.draw import draw_balance_line
+from tools.draw import draw_balance_line, draw_balance_bar
 
 
 def get_total_earnings(earnings: list) -> list:
@@ -38,18 +38,27 @@ def earnings(start, end):
     ).order_by("date")
     date = [formats.date_format(date) for date in objects.values_list("date", flat=True)]
     earnings = list(objects.values_list("earnings", flat=True))
-    total_earnings: list = get_total_earnings(earnings)
-    option = draw_balance_line(
-        xaxis=date,
-        yaxis=[("收益", earnings), ("总计", total_earnings)],
-        title="理财收益"
-    ).dump_options()
+    total_earnings_list: list = get_total_earnings(earnings)
+    
+    # option = draw_balance_line(
+    #     xaxis=date,
+    #     yaxis=[("收益", earnings), ("总计", total_earnings)],
+    #     title="理财收益"
+    # ).dump_options()
 
     total_amount = DayDetailModel.objects.filter(
         date__gte=start,
         date__lte=end,
     ).aggregate(sum=Sum("amount")).get('sum') or 0
-    total_earnings = total_earnings and total_earnings[-1] or 0
+    total_earnings = total_earnings_list and total_earnings_list[-1] or 0
+
+    option = draw_balance_bar(
+        xaxis=date,
+        yaxis=[("收益", earnings)],
+        difference=["总计", total_earnings_list],
+        markline=total_amount,
+        title="理财收益"
+    ).dump_options()
 
     result = {
         "code": 200,
