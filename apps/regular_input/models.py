@@ -1,6 +1,7 @@
-from django.utils import timezone, formats
-
 from django.db import models
+
+from ckeditor.fields import RichTextField
+from django.utils import timezone, formats
 
 # Create your models here.
 
@@ -38,7 +39,7 @@ class RegularInputModel(models.Model):
     worth = models.FloatField('当前价值', blank=False, null=False, default=0)
 
     yield_rate = models.CharField('收益率', max_length=255)
-    note = models.TextField('备注', max_length=255, blank=True, null=True)
+    note = RichTextField('备注', blank=True, null=True)
 
     class Meta:
         db_table = 'tb_regular_input'
@@ -71,7 +72,7 @@ class ButtStockModel(models.Model):
     end_worth = models.FloatField('完结价值', blank=True, null=True, default=0)
 
     yield_rate = models.CharField('收益率', max_length=255)
-    note = models.TextField('备注', max_length=255, blank=True, null=True)
+    note = RichTextField('备注', blank=True, null=True)
 
     class Meta:
         db_table = 'tb_butt_stock'

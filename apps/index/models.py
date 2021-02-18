@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone, formats
+from ckeditor_uploader.fields import RichTextUploadingField
 
 # Create your models here.
 
@@ -11,7 +12,7 @@ class BillModel(models.Model):
     budget = models.FloatField('预算')
     rent = models.FloatField('房租')
     salary_day = models.IntegerField('发薪日')
-    note = models.TextField('备注', blank=True, null=True, max_length=256)
+    note = RichTextUploadingField('备注', blank=True, null=True)
 
     class Meta:
         ordering = ['-date', '-id']
@@ -28,7 +29,7 @@ class DayDetailModel(models.Model):
     name = models.CharField('用途', max_length=20)
     amount = models.FloatField('金额')
     type = models.CharField('类别', choices={('eat', '饮食'), ('other', '其他')}, max_length=10)
-    note = models.TextField('备注', max_length=256, null=True, blank=True)
+    note = RichTextUploadingField('备注', null=True, blank=True)
     bill_id = models.ForeignKey(
         'BillModel',
         on_delete=models.CASCADE,

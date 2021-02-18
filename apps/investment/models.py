@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone, formats
+from ckeditor.fields import RichTextField
 
 # Create your models here.
 
@@ -7,7 +8,7 @@ from django.utils import timezone, formats
 class InvestmentModel(models.Model):
     date = models.DateField('日期', default=timezone.now, unique=True, blank=False)
     earnings = models.FloatField('收益', blank=False, null=False)
-    note = models.TextField('备注', max_length=255, blank=True, null=True)
+    note = RichTextField('备注', blank=True, null=True)
 
     class Meta:
         db_table = 'tb_investment'  # 指明数据库表明

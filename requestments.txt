@@ -1,10 +1,17 @@
 asgiref==3.2.10
+decorator==4.4.2
 Django==3.1.1
+django-ckeditor==6.0.0
+django-js-asset==1.2.2
 django-simpleui==2020.9.26
 Jinja2==2.11.2
 MarkupSafe==1.1.1
+Pillow==8.1.0
 prettytable==0.7.2
 pyecharts==1.7.0
+python-dateutil==2.8.1
 pytz==2020.1
+self==2020.12.3
 simplejson==3.17.2
+six==1.15.0
 sqlparse==0.3.1
