@@ -23,9 +23,10 @@ class IndexView(View):
         """
         try:
             # 日付
-            paid_limit = tool.get_paid_limit()['true']
-            remaining_days = tool.get_paid_limit()['remaining_days']
-            normal_limit = tool.get_paid_limit()['normal']
+            index = tool.get_paid_limit()
+            paid_limit = index['true']
+            remaining_days = index['remaining_days']
+            normal_limit = index['normal']
             # 条形图
             bar = draw.draw_balance_bar(
                 xaxis=[

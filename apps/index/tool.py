@@ -110,8 +110,10 @@ def get_sure_month_bill(date=None) -> BillModel:
         day = DateFormat(date).j()
 
         salary_day = salary_day_with_week_day(date)
+        # 特殊的月份
+        special_month = [2]
 
-        if day < salary_day:
+        if date.month not in special_month and day < salary_day:
             date = date - relativedelta(months=1)
 
         result = BillModel.objects.filter(date__year=date.year, date__month=date.month)
@@ -134,7 +136,7 @@ def get_paid_limit() -> dict:
     # 本月消费
     total_cost = round(bill_id.day_detail.aggregate(sum=Sum('amount')).get('sum', 0) or 0, 2)
     # 本月剩余天数
-    remaining_days: int = get_remaining_days()
+    remaining_days: int = get_remaining_days() or 1
     all_day = int(DateFormat(bill_id.date).t())
     true = round((bill_id.budget - total_cost) / remaining_days, 2)
     return {
