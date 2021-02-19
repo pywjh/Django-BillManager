@@ -278,9 +278,11 @@ def get_objective_year() -> int:
     today = localdate()
     salary_day = salary_day_with_week_day(today)
 
+    # 1月份的时候，需要判断是否是发工资日前后，前要减一个月
     if today.day < salary_day:
         date = today - relativedelta(months=1)
-    return date.year
+        return date.year
+    return today.year
 
 
 def annual(year) -> dict:
