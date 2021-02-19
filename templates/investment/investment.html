@@ -206,7 +206,7 @@
                      left: '100',
                      data: ['收益', 'Top'],
                      textStyle: {
-                        color: 'black'
+                        color: '#111'
                      }
                   },
                   calendar: [{
@@ -263,10 +263,17 @@
                         coordinateSystem: 'calendar',
                         data: data,
                         symbolSize: function (val) {
-                           return val[1] / 60;
+                           return val[1] / 40;
                         },
                         itemStyle: {
-                           color: '#ddb926'
+                           // color: '#ddb926'
+                           color: function (val) {
+                              if (val.data[1] >= 0) {
+                                 return "red"
+                              } else {
+                                 return "green"
+                              }
+                           },
                         }
                      },
                      {
@@ -276,10 +283,17 @@
                         calendarIndex: 1,
                         data: data,
                         symbolSize: function (val) {
-                           return val[1] / 60;
+                           return val[1] / 40;
                         },
                         itemStyle: {
-                           color: '#ddb926'
+                           // color: '#ddb926'
+                           color: function (val) {
+                              if (val.data[1] >= 0) {
+                                 return "red"
+                              } else {
+                                 return "green"
+                              }
+                           },
                         }
                      },
                      {
@@ -291,7 +305,7 @@
                            return b[1] - a[1];
                         }).slice(0, 12),
                         symbolSize: function (val) {
-                           return val[1] / 60
+                           return val[1] / 40;
                         },
                         showEffectOn: 'render',
                         rippleEffect: {
@@ -299,7 +313,7 @@
                         },
                         hoverAnimation: true,
                         itemStyle: {
-                           color: '#f4e925',
+                           color: '#111',
                            shadowBlur: 10,
                            shadowColor: '#333'
                         },
@@ -313,7 +327,7 @@
                            return b[1] - a[1];
                         }).slice(0, 12),
                         symbolSize: function (val) {
-                           return val[1] / 60;
+                           return val[1] / 40;
                         },
                         showEffectOn: 'render',
                         rippleEffect: {
@@ -321,7 +335,13 @@
                         },
                         hoverAnimation: true,
                         itemStyle: {
-                           color: '#f4e925',
+                           color: function (val) {
+                              if (val.data[1] >= 0) {
+                                 return "red"
+                              } else {
+                                 return "green"
+                              }
+                           },
                            shadowBlur: 10,
                            shadowColor: '#333'
                         },
