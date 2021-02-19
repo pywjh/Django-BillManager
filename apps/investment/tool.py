@@ -31,6 +31,17 @@ def get_total_earnings(earnings: list) -> list:
     return list(map(lambda f: round(f, 3), total_earnings_list))
 
 
+def calendar_chart(year: int) -> dict:
+    objects: InvestmentModel = InvestmentModel.objects.filter(date__year=year).order_by("date")
+    data = []
+    for obj in objects:
+        data.append([datetime.datetime.strftime(obj.date, '%Y-%m-%d'), obj.earnings])
+    return {
+        "code": 200,
+        "data": data
+    }
+
+
 def earnings(start, end):
     objects: InvestmentModel = InvestmentModel.objects.filter(
         date__gte=start,

@@ -12,5 +12,6 @@ app_name = 'investment'
 urlpatterns = [
     path('investment', views.investment, name='investment'),
     path('earnings', views.earnings, name='earnings'),
+    path('calendar', views.calendar, name='calendar'),
     path('changeDate', views.change_date, name='change_date'),
 ]

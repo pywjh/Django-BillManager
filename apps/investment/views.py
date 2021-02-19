@@ -9,6 +9,20 @@ def investment(request):
     return render(request, 'investment/investment.html')
 
 
+def calendar(request):
+    try:
+        year = int(request.GET.get('year'))
+        if year and isinstance(year, int):
+            data = tool.calendar_chart(year)
+            return JsonResponse(data, safe=False)
+    except Exception as e:
+        result = {
+            "code": 500,
+            "option": str(e)
+        }
+        return JsonResponse(result)
+
+
 def earnings(request):
     try:
         start = request.GET.get('start')
@@ -20,7 +34,7 @@ def earnings(request):
     except Exception as e:
         result = {
             "code": 500,
-            "option": e
+            "option": str(e)
         }
         return JsonResponse(result)
 
