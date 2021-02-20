@@ -39,6 +39,7 @@ class RegularInputModel(models.Model):
     worth = models.FloatField('当前价值', blank=False, null=False, default=0)
 
     yield_rate = models.CharField('收益率', max_length=255)
+    total_earning = models.FloatField('总收益', default=0)
     note = RichTextField('备注', blank=True, null=True)
 
     class Meta:
@@ -48,10 +49,11 @@ class RegularInputModel(models.Model):
 
     def save(self, *args, **kwargs):
         self.yield_rate = '{:.2%}'.format((self.worth - self.amounts) / self.amounts)
+        self.total_earning = round(self.worth - self.amounts, 2)
         return super(RegularInputModel, self).save(args, **kwargs)
 
     def __str__(self):
-        return f"{formats.date_format(self.date)}"
+        return f"{formats.date_format(self.date)}-{self.item_id.name}"
 
 
 class ButtStockModel(models.Model):
@@ -72,6 +74,7 @@ class ButtStockModel(models.Model):
     end_worth = models.FloatField('完结价值', blank=True, null=True, default=0)
 
     yield_rate = models.CharField('收益率', max_length=255)
+    total_earning = models.FloatField('总收益', default=0)
     note = RichTextField('备注', blank=True, null=True)
 
     class Meta:
@@ -82,7 +85,8 @@ class ButtStockModel(models.Model):
     def save(self, *args, **kwargs):
         self.amount = round((self.copies * self.day_price), 2)
         self.yield_rate = '{:.2%}'.format((self.end_worth - self.amount) / self.amount)
+        self.total_earning = round(self.end_worth - self.amount, 2)
         return super(ButtStockModel, self).save(args, **kwargs)
 
     def __str__(self):
-        return f"{formats.date_format(self.date)}"
+        return f"{formats.date_format(self.date)}-{self.item_id.name}"
