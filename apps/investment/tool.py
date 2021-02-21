@@ -38,7 +38,8 @@ def calendar_chart(year: int) -> dict:
         data.append([datetime.datetime.strftime(obj.date, '%Y-%m-%d'), obj.earnings])
     return {
         "code": 200,
-        "data": data
+        "data": data,
+        "total": round(sum([i[1] for i in data]), 2)
     }
 
 
