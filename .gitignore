@@ -134,3 +134,4 @@ dmypy.json
 migrations/
 /database-backup/
 /media/images/
+/.vscode/

@@ -137,6 +137,7 @@ def get_paid_limit() -> dict:
     total_cost = round(bill_id.day_detail.aggregate(sum=Sum('amount')).get('sum', 0) or 0, 2)
     # 本月剩余天数
     remaining_days: int = get_remaining_days() or 1
+    print(remaining_days)
     all_day = int(DateFormat(bill_id.date).t())
     true = round((bill_id.budget - total_cost) / remaining_days, 2)
     return {
