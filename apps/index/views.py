@@ -4,6 +4,7 @@ from django.views import View
 from django.shortcuts import render, redirect, reverse
 from django.utils import dateformat, timezone
 from django.utils.timezone import localdate
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.conf import settings
 from tools import draw
@@ -13,7 +14,7 @@ from . import tool
 # Create your views here.
 
 
-class IndexView(View):
+class IndexView(LoginRequiredMixin, View):
     """
     首页
     """
@@ -51,7 +52,7 @@ class IndexView(View):
             return redirect("/admin/#/admin/index/billmodel/")
 
 
-class DetailView(View):
+class DetailView(LoginRequiredMixin, View):
     """
     详情页
     """
@@ -82,7 +83,7 @@ class DetailView(View):
         return redirect(reverse('index:detail'))
 
 
-class MonthlyPaymentsView(View):
+class MonthlyPaymentsView(LoginRequiredMixin, View):
     """
     月度收支 页
     """
@@ -116,7 +117,7 @@ class MonthlyPaymentsView(View):
         return redirect(reverse('index:month'))
 
 
-class AnnualPaymentsView(View):
+class AnnualPaymentsView(LoginRequiredMixin, View):
     """
     年度收支
     """
@@ -156,7 +157,7 @@ class AnnualPaymentsView(View):
         return redirect(reverse('index:annual'))
 
 
-class StatisticsView(View):
+class StatisticsView(LoginRequiredMixin, View):
     """
     统计
     """
@@ -177,7 +178,7 @@ class StatisticsView(View):
         return render(request, 'index/statistics.html', locals())
 
 
-class SearchView(View):
+class SearchView(LoginRequiredMixin, View):
     """
     详情
     """

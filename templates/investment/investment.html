@@ -313,7 +313,13 @@
                         },
                         hoverAnimation: true,
                         itemStyle: {
-                           color: '#111',
+                           color: function (val) {
+                              if (val.data[1] >= 0) {
+                                 return "red"
+                              } else {
+                                 return "green"
+                              }
+                           },
                            shadowBlur: 10,
                            shadowColor: '#333'
                         },
