@@ -438,9 +438,11 @@ def statistics():
     total_rent = round(BillModel.objects.values('rent').aggregate(total=Sum('rent')).get('total', 0), 2)
     # 总消费
     total_expend = round(DayDetailModel.objects.values('amount').aggregate(total=Sum('amount')).get('total', 0), 2)
+    # 理财资产
+    total_investment = round(InvestmentModel.objects.values('earnings').aggregate(total=Sum('earnings')).get('total', 0), 2)
     # 剩余资产
-    total_assets = round(total_income - total_expend - total_rent, 2)
-    total_assets_chinese = money2chinese(round(total_income - total_expend - total_rent, 2))
+    total_assets = round(total_income - total_expend - total_rent + total_investment, 2)
+    total_assets_chinese = money2chinese(total_assets)
 
     # 条形图x轴
     bar_x = list(BillModel.objects.values('date__year').annotate(c=Count('date__year')).order_by('date__year').values_list('date__year', flat=True))
@@ -486,6 +488,7 @@ def statistics():
     return {
         'total_assets': total_assets,
         'total_assets_chinese': total_assets_chinese,
+        'total_investment': total_investment,
         'bar_x': list(map(str, bar_x)),  # 卡了我好久，不是字符串line试图显示不出数据来,
         'bar_y': list([bar_expend_y, bar_income_y]),
         'line_y': line_y,

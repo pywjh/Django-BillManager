@@ -43,8 +43,16 @@
 
     <hr>
     <br>
-    <h2>剩余资产 : {{ total_assets }} 元</h2>
-    <h2>{{ total_assets_chinese }} 元</h2>
+    {% if is_earning %} 
+    <h2 style="color: red;">
+    {% else %}
+    <h2 style="color: green;">
+    {% endif %}
+        理财成果 :{{ total_investment }}
+        元
+    </h2>
+    <h2>剩余资产(含理财) : {{ total_assets }} 元</h2>
+    <h2>{{ total_assets_chinese }}</h2>
 </div>
 
 

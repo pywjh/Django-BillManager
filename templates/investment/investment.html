@@ -112,13 +112,18 @@
         `,
       methods: {
          today: function () {
-            var now = new Date();
-            now.setTime(now.getTime());
-            this.end = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
-            if (now.getMonth() === 0) {
-               this.start = `${now.getFullYear() - 1}-12-${now.getDate()}`;
+            let currentDay = new Date()
+            currentDay.setDate(1)
+            currentDay.setTime(currentDay.getTime());
+            let endDay = new Date(currentDay)
+            endDay.setMonth(currentDay.getMonth() + 1)
+            endDay.setDate(0)
+            endDay.setTime(endDay.getTime());
+            this.end = endDay.getFullYear() + "-" + (endDay.getMonth() + 1) + "-" + endDay.getDate();
+            if (currentDay.getMonth() === 0) {
+               this.start = `${currentDay.getFullYear() - 1}-12-${currentDay.getDate()}`;
             } else {
-               this.start = now.getFullYear() + "-" + (now.getMonth()) + "-" + now.getDate();
+               this.start = currentDay.getFullYear() + "-" + (currentDay.getMonth() + 1) + "-" + currentDay.getDate();
             }
          },
          query: function () {
@@ -166,7 +171,7 @@
                   end: date.end,
                }
             });
-            var year = new Date(date.start).getFullYear();
+            var year = new Date(date.end).getFullYear();
             if (result && result.code === 200) {
                // 使用刚指定的配置项和数据显示图表。
                myChart.setOption(JSON.parse(result.option));
