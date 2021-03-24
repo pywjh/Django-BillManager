@@ -70,6 +70,7 @@ class ButtStockModel(models.Model):
         blank=False,
         null=False
     )
+    is_active = models.BooleanField('是否持有', default=False)
     copies = models.FloatField('成交份额', blank=False, null=False)
     end_worth = models.FloatField('完结价值', blank=True, null=True, default=0)
 

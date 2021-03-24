@@ -25,9 +25,9 @@ class RegularInputModelAdmin(admin.ModelAdmin):
 @admin.register(ButtStockModel)
 class ButtStockModelAdmin(admin.ModelAdmin):
     # 在list页面可直接编辑修改
-    list_editable = ["end_worth"]
+    list_editable = ["end_worth", 'is_active']
 
-    list_display = ['date', 'day_price', 'amount', 'item_id', 'copies', 'end_worth', 'total_earning', 'yield_rate', 'note']
+    list_display = ['date', 'day_price', 'amount', 'item_id', 'copies', 'end_worth', 'total_earning', 'yield_rate', 'is_active', 'note']
     search_fields = ['item_id__name', 'note']
     list_filter = ['item_id__name', 'date']
     fieldsets = (  # form页面 显示字段
@@ -35,7 +35,7 @@ class ButtStockModelAdmin(admin.ModelAdmin):
             'date', 'item_id', 'day_price', 'copies', 'end_worth', 'note'
         )}),
     )
-    ordering = ['-date']
+    ordering = ['-is_active', '-date']
 
 
 

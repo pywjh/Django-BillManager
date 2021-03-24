@@ -163,10 +163,10 @@ class StatisticsView(LoginRequiredMixin, View):
     """
     def get(self, request):
         result = tool.statistics()
-        total_investment = "{:,}".format(result['total_investment'])
+        # total_investment = "{:,}".format(result['total_investment'])
         total_assets = "{:,}".format(result['total_assets'])
         total_assets_chinese = result['total_assets_chinese']
-        is_earning = True if result['total_investment'] >= 0 else False
+        # is_earning = True if result['total_investment'] >= 0 else False
         bar = draw.draw_balance_bar(
             xaxis=result['bar_x'],
             yaxis=result['bar_y'],

@@ -13,7 +13,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
 from .models import BillModel, DayDetailModel, SalaryDayModel
-from investment.models import InvestmentModel
+# from investment.models import InvestmentModel
 
 from tools.money2chinese import money2chinese
 from tools.tag import tag
@@ -211,7 +211,7 @@ def get_table_info(date=None, month=None) -> tuple:
         status.insert(
             2, {'name': '其他支出', 'balance': round(bill_id.day_detail.filter(type='other').aggregate(sum=Sum('amount'))['sum'] or 0, 2)}
         )
-        status.append({'name': '理财盈亏', 'balance': round(get_sure_month_investment(date), 2)},)
+        # status.append({'name': '理财盈亏', 'balance': round(get_sure_month_investment(date), 2)},)
     return status, columns
 
 
@@ -298,9 +298,9 @@ def annual(year) -> dict:
         year = last_record and last_record.date.year or BillModel.objects.first().date.year
         bills = BillModel.objects.filter(date__year=year).order_by('date')
 
-    # 投资理财 年度 汇总
-    investment = InvestmentModel.objects.filter(date__year=year)
-    investment_amount = investment.exists() and round(investment.aggregate(total=Sum('earnings')).get('total', 0), 2) or 0
+    # # 投资理财 年度 汇总
+    # investment = InvestmentModel.objects.filter(date__year=year)
+    # investment_amount = investment.exists() and round(investment.aggregate(total=Sum('earnings')).get('total', 0), 2) or 0
 
     # 表格
     total_salary = round(bills.aggregate(total=Sum('salary')).get('total', 0), 2)
@@ -414,10 +414,10 @@ def annual(year) -> dict:
                     "({:.2%})".format(earnings_proportion),
                     style='color:#CD5555'))
             },
-            {
-                'name': f'{year}年投资盈亏',
-                'balance': "{:,}".format(investment_amount)
-            },
+            # {
+            #     'name': f'{year}年投资盈亏',
+            #     'balance': "{:,}".format(investment_amount)
+            # },
         ],  # 表格内容
         'bar_x': bar_x,  # 条形图x轴
         'bar_y': bar_expend_y+bar_income_y,  # 条形图y轴
@@ -438,10 +438,11 @@ def statistics():
     total_rent = round(BillModel.objects.values('rent').aggregate(total=Sum('rent')).get('total', 0), 2)
     # 总消费
     total_expend = round(DayDetailModel.objects.values('amount').aggregate(total=Sum('amount')).get('total', 0), 2)
-    # 理财资产
-    total_investment = round(InvestmentModel.objects.values('earnings').aggregate(total=Sum('earnings')).get('total', 0), 2)
+    # # 理财资产
+    # total_investment = round(InvestmentModel.objects.values('earnings').aggregate(total=Sum('earnings')).get('total', 0), 2)
     # 剩余资产
-    total_assets = round(total_income - total_expend - total_rent + total_investment, 2)
+    # total_assets = round(total_income - total_expend - total_rent + total_investment, 2)
+    total_assets = round(total_income - total_expend - total_rent, 2)
     total_assets_chinese = money2chinese(total_assets)
 
     # 条形图x轴
@@ -488,7 +489,7 @@ def statistics():
     return {
         'total_assets': total_assets,
         'total_assets_chinese': total_assets_chinese,
-        'total_investment': total_investment,
+        # 'total_investment': total_investment,
         'bar_x': list(map(str, bar_x)),  # 卡了我好久，不是字符串line试图显示不出数据来,
         'bar_y': list([bar_expend_y, bar_income_y]),
         'line_y': line_y,
@@ -501,13 +502,21 @@ def search(year_search, select, word):
     搜索功能 
     """
     word = word.strip()
-    result = DayDetailModel.objects.filter(
-        Q(name__contains=word) | Q(note__contains=word)
-    ).order_by('date')
 
+    result = []
     if select == 'year':
         year = year_search or localdate().year
-        result = result.filter(date__year=year)
+        result = DayDetailModel.objects.filter(date__year=year)
+    # 这样写的好处是：如果是年份搜索，先筛选出对应时间范围的，再进行名称搜索
+    # 在数据量大的情况下，这样会加快搜索的速度
+    if result:
+        result = result.filter(
+            Q(name__contains=word) | Q(note__contains=word)
+        ).order_by('date')
+    else:
+        result = DayDetailModel.objects.filter(
+            Q(name__contains=word) | Q(note__contains=word)
+        ).order_by('date')
 
     table = result.values_list('date', 'name', 'amount', 'type', 'note')
     result = result.values('date').annotate(s=Sum('amount')).order_by('date').values_list('date', 's')
