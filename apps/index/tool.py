@@ -13,6 +13,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
 from .models import BillModel, DayDetailModel, SalaryDayModel
+from datetime import datetime
 # from investment.models import InvestmentModel
 
 from tools.money2chinese import money2chinese
@@ -72,7 +73,7 @@ def get_objective_day(date) -> int:
         logging.warning('没有匹配到对应时间账单')
 
 
-def get_remaining_days(date=localdate()) -> int:
+def get_remaining_days(date=datetime.now()) -> int:
     """
     返回根据发薪日，来控制的截止时间（到发薪日还有多少天）
     """
@@ -144,6 +145,7 @@ def get_paid_limit() -> dict:
         'true': true,
         'remaining_days': remaining_days,
         'normal': round(true / (bill_id.budget / all_day), 2),
+        'normal_price': round(bill_id.budget / all_day, 2),
     }
 
 

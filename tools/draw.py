@@ -143,7 +143,7 @@ def draw_wordcloud(data: list, title: str = '云词分析') -> WordCloud:
     data: list(tuple(name1, number1), tuple(name2, number2))
     """
     wd: WordCloud = WordCloud()
-    wd.add(series_name=title, data_pair=data, word_size_range=[15, 120]).set_global_opts(
+    wd.add(series_name=title, data_pair=data, word_size_range=[15, 80]).set_global_opts(
         title_opts=opts.TitleOpts(
             title=title, title_textstyle_opts=opts.TextStyleOpts(font_size=40)
         ),

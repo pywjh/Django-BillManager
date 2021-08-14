@@ -28,6 +28,7 @@ class IndexView(LoginRequiredMixin, View):
             paid_limit = index['true']
             remaining_days = index['remaining_days']
             normal_limit = index['normal']
+            normal_price = index['normal_price']
             # 条形图
             bar = draw.draw_balance_bar(
                 xaxis=[
