@@ -21,8 +21,8 @@ class FriendsModel(models.Model):
     """朋友圈"""
     name = models.CharField("姓名", max_length=20, unique=True, null=False)
     friendship = models.OneToOneField(FriendShipModel, on_delete=models.CASCADE, related_name="friendship", verbose_name="关系")
-    city = models.CharField("城市", max_length=20)
-    note = models.CharField("备注", max_length=255)
+    city = models.CharField("城市", max_length=20, blank=True, null=True)
+    note = models.CharField("备注", max_length=255, blank=True, null=True)
 
     class Meta:
         db_table = 'tb_friend'  # 指明数据库表明
@@ -41,7 +41,7 @@ class SendMoneyRecordModel(models.Model):
     is_refund = models.BooleanField("是否回礼", default=False)
 
     create_time = models.DateTimeField(verbose_name="发生时间", auto_now_add=True)
-    refund_time = models.DateTimeField(verbose_name="回礼时间")
+    refund_time = models.DateTimeField(verbose_name="回礼时间", null=True, blank=True)
 
     class Meta:
         db_table = 'tb_send_money_record'  # 指明数据库表明
