@@ -47,8 +47,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'index.apps.IndexConfig',
-    # 'investment.apps.InvestmentConfig',
+    'investment.apps.InvestmentConfig',
     'regular_input.apps.RegularInputConfig',
+    'send_money.apps.SendMoneyConfig',
 ]
 
 MIDDLEWARE = [

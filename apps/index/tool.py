@@ -14,7 +14,7 @@ from django.conf import settings
 
 from .models import BillModel, DayDetailModel, SalaryDayModel
 from datetime import datetime
-# from investment.models import InvestmentModel
+from investment.models import InvestmentModel
 
 from tools.money2chinese import money2chinese
 from tools.tag import tag

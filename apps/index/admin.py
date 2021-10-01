@@ -38,6 +38,6 @@ class DayDetailAdmin(admin.ModelAdmin):
 
 @admin.register(SalaryDayModel)
 class DayDetailAdmin(admin.ModelAdmin):
-    list_display = ['start_date', 'end_date', 'company', 'day']
+    list_display = [ 'company', 'start_date', 'end_date', 'day']
     search_fields = ['company']
     list_filter = ['company']

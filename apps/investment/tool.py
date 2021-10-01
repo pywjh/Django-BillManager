@@ -8,7 +8,7 @@ import calendar
 import datetime
 from dateutil.relativedelta import relativedelta
 
-# from .models import InvestmentModel
+from .models import InvestmentModel
 from index.models import DayDetailModel
 
 from django.utils import formats, timezone
