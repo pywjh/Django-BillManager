@@ -50,7 +50,11 @@ class IndexView(LoginRequiredMixin, View):
             ).dump_options()
             return render(request, 'index/index.html', locals())
         except ModuleNotFoundError as e:
-            return redirect("/admin/#/admin/index/billmodel/")
+            paid_limit = 9999
+            remaining_days = 1
+            normal_limit = 9999
+            normal_price = 9999
+            return render(request, 'index/index.html', locals())
 
 
 class DetailView(LoginRequiredMixin, View):
